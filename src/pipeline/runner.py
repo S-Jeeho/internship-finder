@@ -181,8 +181,14 @@ def _process_company(
 
     pdf_path: Optional[Path] = None
     try:
-        # a. Tailor CV
-        tailored_cv = tailor.tailor_for_company(company)
+        # a. Tailor CV (fall back to base CV if tailoring fails)
+        try:
+            tailored_cv = tailor.tailor_for_company(company)
+        except CVTailoringError as exc:
+            logger.warning(
+                "CV tailoring failed for %s — using base CV instead: %s", company_label, exc
+            )
+            tailored_cv = tailor.base_cv
 
         # b. Build PDF
         pdf_path = build_pdf(
@@ -210,12 +216,6 @@ def _process_company(
             tracker.mark_emailed(company.company_number, "sent", gmail_message_id=msg_id)
             result.sent += 1
             logger.info("Sent to %s (msg=%s)", company_label, msg_id)
-
-    except CVTailoringError as exc:
-        logger.error("CV tailoring failed for %s: %s", company_label, exc)
-        tracker.mark_emailed(company.company_number, "failed", error_message=str(exc))
-        result.failed += 1
-        result.errors.append(str(exc))
 
     except (EmailSendError, ValueError) as exc:
         logger.error("Email send failed for %s: %s", company_label, exc)

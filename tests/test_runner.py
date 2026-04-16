@@ -133,22 +133,28 @@ def test_tailoring_error_marks_company_failed(tmp_path: Path, tmp_db: Path) -> N
     settings = _make_settings(tmp_path, tmp_db)
     company = _make_company()
 
+    dummy_pdf = tmp_path / "cv.pdf"
+    dummy_pdf.write_bytes(b"%PDF-1.4")
+
     with (
         patch("src.pipeline.runner.CompaniesHouseClient") as MockCH,
         patch("src.pipeline.runner.Geocoder") as MockGeo,
         patch("src.pipeline.runner.CVTailor") as MockTailor,
+        patch("src.pipeline.runner.build_pdf", return_value=dummy_pdf),
         patch("src.pipeline.runner.get_gmail_service"),
-        patch("src.pipeline.runner.send_application") as mock_send,
+        patch("src.pipeline.runner.send_application", return_value="msg_fallback") as mock_send,
     ):
         MockCH.return_value.search_companies_by_sic.return_value = [company]
         MockGeo.return_value.enabled = False
         MockTailor.return_value.tailor_for_company.side_effect = CVTailoringError("API down")
+        MockTailor.return_value.base_cv = "# Fallback CV\n\nBase content."
 
         result = run(settings, dry_run=True, applicant_name="Jane Doe")
 
-        assert result.failed == 1
-        assert len(result.errors) == 1
-        mock_send.assert_not_called()
+        # Tailoring error falls back to base CV — email is still sent
+        assert result.dry_run_count == 1
+        assert result.failed == 0
+        mock_send.assert_called_once()
 
 
 def test_already_emailed_company_is_not_processed_again(tmp_path: Path, tmp_db: Path) -> None:
