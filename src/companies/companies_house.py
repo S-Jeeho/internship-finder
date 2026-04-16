@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 _BASE_URL = "https://api.company-information.service.gov.uk"
 _PAGE_SIZE = 20
-_DEFAULT_RATE_LIMIT_SLEEP = 0.5  # seconds between paginated requests
+_DEFAULT_RATE_LIMIT_SLEEP = 1.0  # seconds between requests (free tier: 600 req/5min)
 
 
 class CompaniesHouseError(Exception):
