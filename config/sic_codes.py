@@ -34,6 +34,16 @@ BIOLOGY_SIC_CODES: dict[str, list[str]] = {
     "agricultural_biotech": [
         "01110",  # Growing of cereals (firms with biotech crop divisions)
     ],
+    "biotech_spinouts_consultancy": [
+        "70229",  # Management consultancy (covers many biotech spinouts and incubators)
+    ],
+    "clinical_health_services": [
+        "86900",  # Other human health activities (clinical-stage startups, CROs)
+        "86210",  # General medical practice activities
+    ],
+    "laboratory_testing": [
+        "71200",  # Technical testing and analysis (contract labs, diagnostics)
+    ],
 }
 
 # Flat list used as the default search parameter for Companies House
@@ -57,15 +67,23 @@ SIC_LABELS: dict[str, str] = {
     "20590": "Specialty chemical manufacturing",
     "75000": "Veterinary / animal health",
     "01110": "Agricultural biotech",
+    "70229": "Biotech spinout / consultancy",
+    "86900": "Clinical-stage biotech / CRO",
+    "86210": "Medical practice / clinical research",
+    "71200": "Contract laboratory / technical testing",
 }
 
 # The recommended default set for a Manchester biotech search
+# Includes startup-friendly codes (70229, 86900, 71200) alongside core biology sectors
 DEFAULT_SEARCH_SIC_CODES: list[str] = [
-    "21100",
-    "21200",
-    "72110",
-    "72190",
-    "26600",
-    "32500",
-    "62012",
+    "21100",  # Pharma manufacturing (basic)
+    "21200",  # Pharma manufacturing (preparations)
+    "72110",  # Biotechnology R&D
+    "72190",  # Natural science R&D
+    "26600",  # Medical devices
+    "32500",  # Medical instruments
+    "62012",  # Life science software
+    "70229",  # Biotech spinouts / consultancy
+    "86900",  # Clinical-stage startups / CROs
+    "71200",  # Contract labs / technical testing
 ]
