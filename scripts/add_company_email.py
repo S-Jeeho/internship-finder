@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config.settings import load_settings
 from src.storage.database import get_connection, init_db
+from src.storage.tracker import Tracker
 
 
 def list_companies(db_path: Path, show_all: bool = False) -> None:
@@ -45,6 +46,13 @@ def list_companies(db_path: Path, show_all: bool = False) -> None:
         email = row["contact_email"] or "(none)"
         address = (row["registered_address"] or "")[:40]
         print(f"{row['company_number']:<12}  {email:<30}  {row['company_name']}  |  {address}")
+
+
+def reset_sent(db_path: Path) -> None:
+    """Remove all 'sent' log entries so previously-emailed companies can be re-sent."""
+    tracker = Tracker(db_path)
+    count = tracker.reset_sent_status()
+    print(f"Reset {count} companies to 'pending'. They will be picked up on the next pipeline run.")
 
 
 def clear_all_emails(db_path: Path) -> None:
@@ -90,6 +98,11 @@ def main() -> None:
         help="Wipe all contact emails so they can be re-enriched from scratch.",
     )
     parser.add_argument(
+        "--reset-sent",
+        action="store_true",
+        help="Clear 'sent' status so companies with new emails can be re-emailed.",
+    )
+    parser.add_argument(
         "--set",
         nargs=2,
         metavar=("COMPANY_NUMBER", "EMAIL"),
@@ -105,7 +118,9 @@ def main() -> None:
 
     init_db(settings.DB_PATH)
 
-    if args.clear_emails:
+    if args.reset_sent:
+        reset_sent(settings.DB_PATH)
+    elif args.clear_emails:
         clear_all_emails(settings.DB_PATH)
     elif args.set:
         set_email(settings.DB_PATH, args.set[0], args.set[1])

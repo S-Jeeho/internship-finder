@@ -75,6 +75,30 @@ class Tracker:
             "Marked company %s as '%s' (msg_id=%s)", company_number, status, gmail_message_id
         )
 
+    def reset_sent_status(self, company_numbers: Optional[list[str]] = None) -> int:
+        """
+        Remove 'sent' entries from email_log so companies can be re-emailed.
+        If company_numbers is None, resets ALL sent companies.
+        Returns the number of rows deleted.
+        """
+        with get_connection(self.db_path) as conn:
+            if company_numbers:
+                ph = ",".join("?" * len(company_numbers))
+                cursor = conn.execute(
+                    f"DELETE FROM email_log WHERE status = 'sent' AND company_number IN ({ph})",
+                    company_numbers,
+                )
+                conn.execute(
+                    f"UPDATE companies SET status = 'pending' WHERE company_number IN ({ph})",
+                    company_numbers,
+                )
+            else:
+                cursor = conn.execute("DELETE FROM email_log WHERE status = 'sent'")
+                conn.execute("UPDATE companies SET status = 'pending' WHERE status = 'sent'")
+        deleted = cursor.rowcount
+        logger.info("Reset sent status for %d companies", deleted)
+        return deleted
+
     # ── Read ──────────────────────────────────────────────────────────────────
 
     def get_uncontacted_companies(self) -> list[Company]:
