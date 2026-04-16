@@ -95,8 +95,11 @@ class CompaniesHouseClient:
                 if profile is None:
                     continue
 
+                # Live API returns sic_codes as plain strings e.g. ["72110"]
+                raw_sics = profile.get("sic_codes", [])
                 company_sic_codes = [
-                    s.get("sic_code", "") for s in profile.get("sic_codes", [])
+                    s if isinstance(s, str) else s.get("sic_code", "")
+                    for s in raw_sics
                 ]
                 if not sic_set.intersection(company_sic_codes):
                     continue
@@ -126,7 +129,8 @@ class CompaniesHouseClient:
         profile = self._get_company_profile(company_number)
         if profile is None:
             return None
-        sic_codes = [s.get("sic_code", "") for s in profile.get("sic_codes", [])]
+        raw_sics = profile.get("sic_codes", [])
+        sic_codes = [s if isinstance(s, str) else s.get("sic_code", "") for s in raw_sics]
         return self._profile_to_company(profile, sic_codes)
 
     # ── Private helpers ───────────────────────────────────────────────────────
