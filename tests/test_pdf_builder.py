@@ -61,10 +61,9 @@ def test_build_pdf_two_calls_produce_different_files(tmp_path: Path) -> None:
     assert p1 != p2  # filenames differ (uuid-based)
 
 
-def test_build_pdf_raises_on_weasyprint_error(tmp_path: Path) -> None:
-    with patch("src.cv.pdf_builder.weasyprint.HTML") as mock_html:
-        mock_html.return_value.write_pdf.side_effect = Exception("render crash")
-        with pytest.raises(RuntimeError, match="WeasyPrint failed"):
+def test_build_pdf_raises_on_render_error(tmp_path: Path) -> None:
+    with patch("src.cv.pdf_builder.FPDF.output", side_effect=Exception("render crash")):
+        with pytest.raises(RuntimeError, match="PDF generation failed"):
             build_pdf(SAMPLE_CV, output_dir=tmp_path, filename="crash_test")
 
 
