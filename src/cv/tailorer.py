@@ -32,6 +32,10 @@ class CVTailor:
         self._base_cv = self._load_cv(base_cv_path)
         logger.debug("CVTailor initialised, base CV: %d chars", len(self._base_cv))
 
+    @property
+    def base_cv(self) -> str:
+        return self._base_cv
+
     # ── Public interface ──────────────────────────────────────────────────────
 
     def tailor_for_company(self, company: Company) -> str:
