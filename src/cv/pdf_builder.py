@@ -38,6 +38,25 @@ class _CVPDF(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}", align="C")
 
 
+_UNICODE_REPLACEMENTS = str.maketrans({
+    "\u2013": "-",   # en-dash
+    "\u2014": "--",  # em-dash
+    "\u2018": "'",   # left single quote
+    "\u2019": "'",   # right single quote / apostrophe
+    "\u201c": '"',   # left double quote
+    "\u201d": '"',   # right double quote
+    "\u2022": "-",   # bullet
+    "\u00b7": ".",   # middle dot
+    "\u2026": "...", # ellipsis
+    "\u00a0": " ",   # non-breaking space
+})
+
+
+def _sanitise(text: str) -> str:
+    """Replace Unicode characters unsupported by Helvetica with ASCII equivalents."""
+    return text.translate(_UNICODE_REPLACEMENTS).encode("latin-1", errors="replace").decode("latin-1")
+
+
 def _strip_markdown_bold(text: str) -> str:
     """Remove **bold** and *italic* markers, return plain text."""
     text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
@@ -55,12 +74,11 @@ def _render_inline(pdf: FPDF, text: str, base_size: float = 10.5) -> None:
     for part in parts:
         if part.startswith("**") and part.endswith("**"):
             pdf.set_font("Helvetica", "B", base_size)
-            pdf.write(5, part[2:-2])
+            pdf.write(5, _sanitise(part[2:-2]))
         else:
-            # Strip remaining single * italic markers
             plain = re.sub(r"\*(.+?)\*", r"\1", part)
             pdf.set_font("Helvetica", "", base_size)
-            pdf.write(5, plain)
+            pdf.write(5, _sanitise(plain))
 
 
 def build_pdf(
@@ -105,7 +123,7 @@ def build_pdf(
 
             # ── H1: # Name ────────────────────────────────────────────────────
             if stripped.startswith("# ") and not stripped.startswith("## "):
-                text = stripped[2:].strip()
+                text = _sanitise(stripped[2:].strip())
                 pdf.set_font("Helvetica", "B", 18)
                 pdf.set_text_color(30, 30, 30)
                 pdf.cell(0, 10, text, ln=True)
@@ -119,7 +137,7 @@ def build_pdf(
 
             # ── H2: ## Section ────────────────────────────────────────────────
             elif stripped.startswith("## "):
-                text = stripped[3:].strip()
+                text = _sanitise(stripped[3:].strip())
                 pdf.ln(3)
                 pdf.set_font("Helvetica", "B", 12)
                 pdf.set_text_color(44, 111, 173)
@@ -133,7 +151,7 @@ def build_pdf(
 
             # ── H3: ### Subheading ────────────────────────────────────────────
             elif stripped.startswith("### "):
-                text = stripped[4:].strip()
+                text = _sanitise(stripped[4:].strip())
                 pdf.set_font("Helvetica", "B", 10.5)
                 pdf.set_text_color(30, 30, 30)
                 pdf.cell(0, 6, _strip_markdown_bold(text), ln=True)
