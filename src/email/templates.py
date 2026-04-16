@@ -1,31 +1,35 @@
 """
 Email subject and body templates for internship applications.
 
-Provides render_email(company) -> (subject, body) using simple string
-substitution. Edit the templates here to change the tone or content of
-every application email without touching the sender logic.
+Provides render_email(company, applicant_name) -> (subject, body).
+Edit the templates here to change the tone or content of every application
+email without touching the sender logic.
 """
 
 from src.companies.models import Company
 from config.sic_codes import SIC_LABELS
 
-SUBJECT_TEMPLATE = "Internship Application — Biology / {sector} — {applicant_name}"
+SUBJECT_TEMPLATE = "Summer Internship Application 2025 — {applicant_name}"
 
 BODY_TEMPLATE = """\
 Dear {company_name} Team,
 
-I am writing to express my keen interest in undertaking an internship with {company_name}. \
-I am currently studying biology and am particularly excited about the work being done in \
-the {sector} field.
+I hope this email finds you well. My name is {applicant_name} and I am a biology \
+student currently looking for a summer internship placement for 2025. I came across \
+{company_name} and was genuinely impressed by your work in {sector}, which aligns \
+closely with my academic background and career interests.
 
-I have attached my CV, which has been tailored to highlight the skills and experience most \
-relevant to your organisation. I would welcome the opportunity to contribute to your team \
-and to learn from the experts at {company_name}.
+I would love the opportunity to contribute to your team over the summer, even in a \
+supporting capacity — whether that involves laboratory work, data analysis, research \
+assistance, or anything else where an enthusiastic biology student could be useful. \
+I am also fully open to a remote or hybrid arrangement if that works better for your \
+organisation.
 
-Please do not hesitate to contact me if you would like any further information or to \
-arrange an interview at a mutually convenient time.
+I have attached a tailored CV for your review. I am a fast learner, reliable, and \
+genuinely motivated by the kind of science {company_name} is doing. I would be very \
+grateful for even a brief conversation if there is any possibility of a placement.
 
-Thank you for considering my application.
+Thank you so much for taking the time to read this — I really appreciate it.
 
 Kind regards,
 {applicant_name}
@@ -38,7 +42,7 @@ def render_email(company: Company, applicant_name: str) -> tuple[str, str]:
 
     Args:
         company: Target company.
-        applicant_name: The applicant's full name (from the CV / config).
+        applicant_name: The applicant's full name.
 
     Returns:
         (subject, body) as plain strings.

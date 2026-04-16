@@ -60,9 +60,9 @@ def test_render_email_subject_contains_applicant_name(company: Company) -> None:
     assert "Jane Doe" in subject
 
 
-def test_render_email_subject_contains_sector(company: Company) -> None:
+def test_render_email_subject_contains_internship(company: Company) -> None:
     subject, _ = render_email(company, applicant_name="Jane Doe")
-    assert "Biotechnology" in subject or "Biology" in subject or "SIC" in subject
+    assert "Internship" in subject or "internship" in subject
 
 
 # ── _build_mime_message ───────────────────────────────────────────────────────
