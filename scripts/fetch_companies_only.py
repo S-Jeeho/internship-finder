@@ -15,6 +15,7 @@ Usage:
 import argparse
 import logging
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -60,7 +61,7 @@ def main() -> None:
     all_companies = []
     seen_numbers = set()
 
-    for keyword in keywords:
+    for i, keyword in enumerate(keywords):
         logger.info("Searching for: '%s'", keyword)
         companies = client.search_companies_by_sic(
             sic_codes, location_term=keyword, max_results=args.max
@@ -69,6 +70,9 @@ def main() -> None:
             if c.company_number not in seen_numbers:
                 seen_numbers.add(c.company_number)
                 all_companies.append(c)
+        # Pause between keywords to avoid rate limiting
+        if i < len(keywords) - 1:
+            time.sleep(5)
 
     if geocoder.enabled:
         all_companies = geocoder.enrich_with_distance(all_companies)
