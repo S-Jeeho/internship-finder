@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 _BASE_URL = "https://api.company-information.service.gov.uk"
 _PAGE_SIZE = 20
 _DEFAULT_RATE_LIMIT_SLEEP = 1.0  # seconds between requests (free tier: 600 req/5min)
+_RETRY_WAIT_429 = 61  # seconds to wait when rate limited before retrying
 
 
 class CompaniesHouseError(Exception):
@@ -135,6 +136,24 @@ class CompaniesHouseClient:
 
     # ── Private helpers ───────────────────────────────────────────────────────
 
+    def _get_company_profile(self, company_number: str) -> Optional[dict]:
+        url = f"{_BASE_URL}/company/{company_number}"
+        for attempt in range(3):
+            response = self._session.get(url, timeout=10)
+            if response.status_code == 404:
+                logger.debug("Company %s not found", company_number)
+                return None
+            if response.status_code == 429:
+                logger.warning(
+                    "Rate limited — waiting %ds before retry (attempt %d/3)",
+                    _RETRY_WAIT_429, attempt + 1,
+                )
+                time.sleep(_RETRY_WAIT_429)
+                continue
+            self._raise_for_status(response)
+            return response.json()
+        raise CompaniesHouseError("Rate limited by Companies House API after 3 retries")
+
     def _search_page(self, query: str, start_index: int) -> dict:
         url = f"{_BASE_URL}/search/companies"
         params = {
@@ -142,18 +161,18 @@ class CompaniesHouseClient:
             "items_per_page": _PAGE_SIZE,
             "start_index": start_index,
         }
-        response = self._session.get(url, params=params, timeout=10)
-        self._raise_for_status(response)
-        return response.json()
-
-    def _get_company_profile(self, company_number: str) -> Optional[dict]:
-        url = f"{_BASE_URL}/company/{company_number}"
-        response = self._session.get(url, timeout=10)
-        if response.status_code == 404:
-            logger.debug("Company %s not found", company_number)
-            return None
-        self._raise_for_status(response)
-        return response.json()
+        for attempt in range(3):
+            response = self._session.get(url, params=params, timeout=10)
+            if response.status_code == 429:
+                logger.warning(
+                    "Rate limited on search — waiting %ds (attempt %d/3)",
+                    _RETRY_WAIT_429, attempt + 1,
+                )
+                time.sleep(_RETRY_WAIT_429)
+                continue
+            self._raise_for_status(response)
+            return response.json()
+        raise CompaniesHouseError("Rate limited by Companies House API after 3 retries")
 
     @staticmethod
     def _raise_for_status(response: requests.Response) -> None:
