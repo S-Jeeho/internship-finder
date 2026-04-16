@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Optional
 
 from config.settings import Settings
-from config.sic_codes import DEFAULT_SEARCH_SIC_CODES
+from config.sic_codes import BIOLOGY_SEARCH_TERMS, DEFAULT_SEARCH_SIC_CODES
 from src.companies.companies_house import CompaniesHouseClient
 from src.companies.geocoder import Geocoder
 from src.companies.models import Company
@@ -55,7 +55,7 @@ def run(
     applicant_name: str = "The Applicant",
     max_companies: Optional[int] = None,
     dry_run: bool = False,
-    location_term: str = "Manchester",
+    search_keywords: Optional[list[str]] = None,
 ) -> PipelineResult:
     """
     Run the full internship-finder pipeline.
@@ -66,12 +66,13 @@ def run(
         applicant_name: Full name for the email body signature.
         max_companies: Cap on companies to process in this run (overrides config).
         dry_run: If True, skips sending emails and deletes temp PDFs.
-        location_term: Location keyword for Companies House search.
+        search_keywords: Biology keywords to search (defaults to BIOLOGY_SEARCH_TERMS).
 
     Returns:
         PipelineResult with counts of sent, failed, skipped, and dry-run emails.
     """
     sic_codes = sic_codes or DEFAULT_SEARCH_SIC_CODES
+    keywords = search_keywords or BIOLOGY_SEARCH_TERMS
     cap = max_companies if max_companies is not None else settings.MAX_COMPANIES_PER_RUN or None
     result = PipelineResult()
 
@@ -80,14 +81,22 @@ def run(
     tracker = Tracker(settings.DB_PATH)
     logger.info("Database ready at %s", settings.DB_PATH)
 
-    # ── 2. Fetch companies ────────────────────────────────────────────────────
+    # ── 2. Fetch companies using biology-specific keywords ────────────────────
     ch_client = CompaniesHouseClient(settings.COMPANIES_HOUSE_API_KEY)
-    companies = ch_client.search_companies_by_sic(
-        sic_codes=sic_codes,
-        location_term=location_term,
-        max_results=cap,
-    )
-    logger.info("Fetched %d companies from Companies House", len(companies))
+    seen: set[str] = set()
+    companies = []
+    per_keyword = max(1, (cap or 20) // len(keywords))
+    for keyword in keywords:
+        results = ch_client.search_companies_by_sic(
+            sic_codes=sic_codes,
+            location_term=keyword,
+            max_results=per_keyword,
+        )
+        for c in results:
+            if c.company_number not in seen:
+                seen.add(c.company_number)
+                companies.append(c)
+    logger.info("Fetched %d unique companies from Companies House", len(companies))
 
     # ── 3. Geocode + filter by distance (optional) ────────────────────────────
     geocoder = Geocoder(settings.GOOGLE_MAPS_API_KEY)
