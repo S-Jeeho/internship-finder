@@ -74,7 +74,7 @@ SIC_LABELS: dict[str, str] = {
 }
 
 # The recommended default set for a Manchester biotech search
-# Includes startup-friendly codes (70229, 86900, 71200) alongside core biology sectors
+# Note: 86900/86210/70229 excluded — too broad, catches clinics and consultancies
 DEFAULT_SEARCH_SIC_CODES: list[str] = [
     "21100",  # Pharma manufacturing (basic)
     "21200",  # Pharma manufacturing (preparations)
@@ -83,7 +83,20 @@ DEFAULT_SEARCH_SIC_CODES: list[str] = [
     "26600",  # Medical devices
     "32500",  # Medical instruments
     "62012",  # Life science software
-    "70229",  # Biotech spinouts / consultancy
-    "86900",  # Clinical-stage startups / CROs
     "71200",  # Contract labs / technical testing
+]
+
+# Biology keywords to use as search terms (used instead of just "Manchester")
+# Searching by specific terms returns far more targeted results than location alone
+BIOLOGY_SEARCH_TERMS: list[str] = [
+    "biotech",
+    "biotechnology",
+    "pharmaceutical",
+    "bioinformatics",
+    "genomics",
+    "therapeutics",
+    "diagnostics",
+    "bioscience",
+    "life science",
+    "molecular biology",
 ]

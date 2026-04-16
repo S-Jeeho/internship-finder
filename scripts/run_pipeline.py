@@ -102,7 +102,6 @@ def main() -> None:
         applicant_name=args.name,
         max_companies=args.max_companies,
         dry_run=args.dry_run,
-        location_term=args.location,
     )
 
     print(
