@@ -21,7 +21,7 @@ closely with my academic background and career interests.
 
 I would love the opportunity to contribute to your team over the summer, even in a \
 supporting capacity — whether that involves laboratory work, data analysis, research \
-assistance, or anything else where an enthusiastic biology student could be useful. \
+assistance, or anything else where an enthusiastic biotechnology student could be useful. \
 I am also fully open to a remote or hybrid arrangement if that works better for your \
 organisation.
 

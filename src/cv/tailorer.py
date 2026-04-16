@@ -82,7 +82,7 @@ class CVTailor:
         description_snippet = (
             company.description[:300] if company.description else "Not available"
         )
-        return f"""You are helping a biology student tailor their CV for an internship application.
+        return f"""You are helping a biotechnology student tailor their CV for an internship application.
 
 ## Company Information
 - **Name**: {company.company_name}
