@@ -3,9 +3,10 @@
 Utility — view companies in the database and add/update contact emails.
 
 Usage:
-    python scripts/add_company_email.py           # list companies without emails
-    python scripts/add_company_email.py --all     # list all companies
+    python scripts/add_company_email.py                 # list companies without emails
+    python scripts/add_company_email.py --all           # list all companies
     python scripts/add_company_email.py --set 12345678 hr@company.co.uk
+    python scripts/add_company_email.py --clear-emails  # wipe all contact emails (re-enrich)
 """
 
 import argparse
@@ -46,6 +47,15 @@ def list_companies(db_path: Path, show_all: bool = False) -> None:
         print(f"{row['company_number']:<12}  {email:<30}  {row['company_name']}  |  {address}")
 
 
+def clear_all_emails(db_path: Path) -> None:
+    with get_connection(db_path) as conn:
+        count = conn.execute(
+            "SELECT COUNT(*) FROM companies WHERE contact_email IS NOT NULL"
+        ).fetchone()[0]
+        conn.execute("UPDATE companies SET contact_email = NULL")
+    print(f"Cleared contact emails for {count} companies. Run enrich_companies.py to re-populate.")
+
+
 def set_email(db_path: Path, company_number: str, email: str) -> None:
     with get_connection(db_path) as conn:
         row = conn.execute(
@@ -75,6 +85,11 @@ def main() -> None:
         help="List all companies, not just those missing emails.",
     )
     parser.add_argument(
+        "--clear-emails",
+        action="store_true",
+        help="Wipe all contact emails so they can be re-enriched from scratch.",
+    )
+    parser.add_argument(
         "--set",
         nargs=2,
         metavar=("COMPANY_NUMBER", "EMAIL"),
@@ -90,7 +105,9 @@ def main() -> None:
 
     init_db(settings.DB_PATH)
 
-    if args.set:
+    if args.clear_emails:
+        clear_all_emails(settings.DB_PATH)
+    elif args.set:
         set_email(settings.DB_PATH, args.set[0], args.set[1])
     else:
         list_companies(settings.DB_PATH, show_all=args.all)
