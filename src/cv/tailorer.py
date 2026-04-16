@@ -4,9 +4,6 @@ CV Tailorer — uses the Claude API to make small, targeted CV adjustments.
 Given a base CV (Markdown text) and a Company object, Claude is asked to
 make 3-5 specific adjustments that make the CV more relevant to that company.
 The overall structure, length, and content must not change significantly.
-
-A length-validation guard (±20%) catches runaway Claude responses before they
-become malformed PDFs.
 """
 
 import logging
@@ -19,9 +16,10 @@ from config.sic_codes import SIC_LABELS
 
 logger = logging.getLogger(__name__)
 
-_LENGTH_TOLERANCE = 0.40  # allow ±40% change in character count
+_LENGTH_TOLERANCE = 0.60  # allow ±60% change in character count
 _MODEL = "claude-sonnet-4-6"
-_MAX_TOKENS = 4096
+_MAX_TOKENS = 8192
+_MIN_CV_CHARS = 200  # anything shorter is clearly a bad response
 
 
 class CVTailoringError(Exception):
@@ -40,15 +38,8 @@ class CVTailor:
         """
         Return a lightly tailored version of the base CV for this company.
 
-        Args:
-            company: The target company.
-
-        Returns:
-            Tailored CV as a Markdown string.
-
         Raises:
-            CVTailoringError: If the API call fails or the response is too
-                              different in length from the original.
+            CVTailoringError: If the API call fails or the response is unusable.
         """
         sector_label = company.primary_sic_label(SIC_LABELS)
         prompt = self._build_prompt(company, sector_label)
@@ -64,7 +55,17 @@ class CVTailor:
         except anthropic.APIError as exc:
             raise CVTailoringError(f"Claude API error for {company.company_name}: {exc}") from exc
 
+        if not message.content:
+            raise CVTailoringError(f"Claude returned empty response for {company.company_name}")
+
         tailored = self._clean_response(message.content[0].text)
+
+        if len(tailored) < _MIN_CV_CHARS:
+            raise CVTailoringError(
+                f"Claude returned a near-empty response for {company.company_name} "
+                f"({len(tailored)} chars). The CV was not tailored."
+            )
+
         self._validate_length(tailored, company.company_name)
 
         logger.debug(
@@ -87,35 +88,37 @@ class CVTailor:
 - **Name**: {company.company_name}
 - **Sector**: {sector_label}
 - **Location**: {company.registered_address or "Manchester area, UK"}
-- **Company description**: {description_snippet}
+- **Description**: {description_snippet}
 
-## Task
-Make 3 to 5 small, targeted adjustments to the CV below to make it more relevant to this specific company and sector.
+## Your Task
+Make 3 to 5 small, targeted word-level changes to the CV so it reads as a better fit for this company.
 
-### Rules (STRICT — do not break these):
-1. Do NOT change the overall structure or section headings.
-2. Do NOT add new sections or remove existing ones.
-3. Do NOT invent qualifications, skills, or experience the candidate does not have.
-4. Keep the total length within ±20% of the original.
-5. Small changes only: reorder bullet points, swap generic phrases for sector-specific ones, add a brief one-sentence objective at the top if there is none.
-6. Return ONLY the modified CV in Markdown. No preamble, no explanation, no "Here is the tailored CV:" header.
+CRITICAL RULES — read carefully:
+1. Output the COMPLETE, FULL CV from the very first line to the very last line. Do NOT omit any section.
+2. Do NOT change section headings, overall structure, or the number of bullet points.
+3. Do NOT invent qualifications or experience the candidate does not have.
+4. Only swap specific words/phrases for more sector-relevant ones (e.g. "data analysis" → "genomic data analysis").
+5. You may add one short objective sentence at the top if there is none already.
+6. Output RAW Markdown only — no code fences, no preamble, no "Here is the CV:" line.
 
-## Base CV
+## Base CV (copy this in full, with your small changes applied)
 {self._base_cv}
 """
 
     @staticmethod
     def _clean_response(text: str) -> str:
-        """Strip preamble/postamble and markdown code fences Claude may add."""
+        """Strip any code fences or preamble Claude may add despite instructions."""
         text = text.strip()
-        # Remove ```markdown ... ``` or ``` ... ``` wrappers
         if text.startswith("```"):
             lines = text.splitlines()
-            # Drop the opening fence line and any closing fence
             inner = lines[1:]
             if inner and inner[-1].strip().startswith("```"):
                 inner = inner[:-1]
             text = "\n".join(inner).strip()
+        # Strip a leading explanation line (e.g. "Here is the tailored CV:")
+        lines = text.splitlines()
+        if lines and not lines[0].startswith("#") and lines[0].endswith(":"):
+            text = "\n".join(lines[1:]).strip()
         return text
 
     def _validate_length(self, tailored: str, company_name: str) -> None:

@@ -132,7 +132,7 @@ def test_tailor_raises_on_too_short_response(
 ) -> None:
     tiny = "Hi."
     mock_client.messages.create.return_value = _make_api_response(tiny)
-    with pytest.raises(CVTailoringError, match="different in length"):
+    with pytest.raises(CVTailoringError, match="near-empty"):
         tailor.tailor_for_company(company)
 
 
