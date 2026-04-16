@@ -126,8 +126,10 @@ def test_search_raises_on_rate_limit(client: CompaniesHouseClient) -> None:
     mock_session.get.return_value = mock_429
     client._session = mock_session
 
-    with pytest.raises(CompaniesHouseError, match="Rate limited"):
-        client.search_companies_by_sic(["72110"])
+    # Patch sleep so the 61s retry waits don't run in tests
+    with patch("src.companies.companies_house.time.sleep"):
+        with pytest.raises(CompaniesHouseError, match="Rate limited"):
+            client.search_companies_by_sic(["72110"])
 
 
 def test_profile_address_is_formatted(client: CompaniesHouseClient) -> None:
