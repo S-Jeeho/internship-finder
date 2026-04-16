@@ -19,7 +19,7 @@ from config.sic_codes import SIC_LABELS
 
 logger = logging.getLogger(__name__)
 
-_LENGTH_TOLERANCE = 0.20  # allow ±20% change in character count
+_LENGTH_TOLERANCE = 0.40  # allow ±40% change in character count
 _MODEL = "claude-sonnet-4-6"
 _MAX_TOKENS = 4096
 
@@ -64,7 +64,7 @@ class CVTailor:
         except anthropic.APIError as exc:
             raise CVTailoringError(f"Claude API error for {company.company_name}: {exc}") from exc
 
-        tailored = message.content[0].text.strip()
+        tailored = self._clean_response(message.content[0].text)
         self._validate_length(tailored, company.company_name)
 
         logger.debug(
@@ -103,6 +103,20 @@ Make 3 to 5 small, targeted adjustments to the CV below to make it more relevant
 ## Base CV
 {self._base_cv}
 """
+
+    @staticmethod
+    def _clean_response(text: str) -> str:
+        """Strip preamble/postamble and markdown code fences Claude may add."""
+        text = text.strip()
+        # Remove ```markdown ... ``` or ``` ... ``` wrappers
+        if text.startswith("```"):
+            lines = text.splitlines()
+            # Drop the opening fence line and any closing fence
+            inner = lines[1:]
+            if inner and inner[-1].strip().startswith("```"):
+                inner = inner[:-1]
+            text = "\n".join(inner).strip()
+        return text
 
     def _validate_length(self, tailored: str, company_name: str) -> None:
         base_len = len(self._base_cv)
