@@ -110,10 +110,8 @@ def test_pick_best_falls_back_to_first() -> None:
 
 def test_guess_domain_returns_working_domain() -> None:
     enricher = EmailEnricher(smtp_verify=False)
-    mock_resp = MagicMock()
-    mock_resp.status_code = 200
 
-    with patch("src.companies.email_enricher.requests.head", return_value=mock_resp):
+    with patch("src.companies.email_enricher.requests.head", return_value=_mock_head_ok("https://biotechinnovations.co.uk")):
         domain = enricher._guess_domain("BioTech Innovations Ltd")
 
     assert domain is not None
@@ -143,9 +141,10 @@ def test_guess_domain_skips_500_responses() -> None:
 
 # ── EmailEnricher.find_email ──────────────────────────────────────────────────
 
-def _mock_head_ok() -> MagicMock:
+def _mock_head_ok(url: str = "https://biotech.co.uk") -> MagicMock:
     r = MagicMock()
     r.status_code = 200
+    r.url = url
     return r
 
 
@@ -160,7 +159,8 @@ def test_find_email_returns_scraped_email() -> None:
     enricher = EmailEnricher(smtp_verify=False)
 
     with (
-        patch("src.companies.email_enricher.requests.head", return_value=_mock_head_ok()),
+        patch("src.companies.email_enricher.requests.head",
+              return_value=_mock_head_ok("https://biotech.co.uk")),
         patch("src.companies.email_enricher.requests.get",
               return_value=_mock_get_with_email("hello@biotech.co.uk")),
     ):
