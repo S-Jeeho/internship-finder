@@ -89,22 +89,27 @@ class EmailEnricher:
     # ── Website / domain discovery ─────────────────────────────────────────
 
     def _guess_domain(self, company_name: str) -> Optional[str]:
-        """Return the first domain that responds to HTTP HEAD, or None."""
+        """Return the actual domain (after redirects) if found, or None."""
         slug = _name_to_slug(company_name)
         if not slug:
             return None
 
-        for domain in [f"{slug}{tld}" for tld in _TLDS]:
+        for candidate in [f"{slug}{tld}" for tld in _TLDS]:
             for scheme in ("https", "http"):
                 try:
                     resp = requests.head(
-                        f"{scheme}://{domain}",
+                        f"{scheme}://{candidate}",
                         timeout=_REQUEST_TIMEOUT,
                         allow_redirects=True,
                     )
                     if resp.status_code < 500:
-                        logger.debug("Domain found: %s (%s)", domain, resp.status_code)
-                        return domain
+                        from urllib.parse import urlparse
+                        try:
+                            final_domain = urlparse(str(resp.url)).netloc.lstrip("www.") or candidate
+                        except Exception:
+                            final_domain = candidate
+                        logger.debug("Domain found: %s → %s (%s)", candidate, final_domain, resp.status_code)
+                        return final_domain
                 except requests.RequestException:
                     continue
 
@@ -114,8 +119,9 @@ class EmailEnricher:
 
     def _scrape_emails_from_website(self, domain: str) -> list[str]:
         """
-        Visit the website's common pages and extract any email addresses found
-        in the HTML. Returns deduplicated list, excluding no-reply addresses.
+        Visit the website's common pages and extract email addresses that
+        belong to the company's own domain only. Third-party emails embedded
+        on the page (analytics, CDNs, partner sites) are ignored.
         """
         found: set[str] = set()
 
@@ -130,15 +136,15 @@ class EmailEnricher:
                         headers={"User-Agent": "Mozilla/5.0 (compatible; internship-finder/1.0)"},
                     )
                     if resp.status_code == 200:
-                        emails = _extract_emails_from_html(resp.text, domain)
+                        emails = _extract_own_domain_emails(resp.text, domain)
                         found.update(emails)
                         if found:
-                            break  # got something from this path, no need to try http
+                            break
                 except requests.RequestException:
                     continue
 
             if found:
-                break  # found emails on this page — stop searching
+                break
 
         return list(found)
 
@@ -165,17 +171,15 @@ class EmailEnricher:
 
 # ── Module-level helpers ───────────────────────────────────────────────────────
 
-def _extract_emails_from_html(html: str, domain: str) -> list[str]:
+def _extract_own_domain_emails(html: str, domain: str) -> list[str]:
     """
-    Extract email addresses from HTML source, keeping only those that belong
-    to the company's own domain or are clearly contact addresses.
+    Extract emails from HTML that belong to the company's own domain only.
+    Third-party emails (analytics, CDNs, partner sites) are discarded.
     """
+    domain_base = domain.lstrip("www.").lower()
     raw = re.findall(r"[\w.+%-]+@[\w.-]+\.[a-zA-Z]{2,}", html)
     results: list[str] = []
     seen: set[str] = set()
-
-    # Extract domain base without subdomain for matching
-    domain_base = domain.lstrip("www.")
 
     for email in raw:
         email = email.lower().strip(".")
@@ -183,22 +187,26 @@ def _extract_emails_from_html(html: str, domain: str) -> list[str]:
             continue
         seen.add(email)
 
-        prefix = email.split("@")[0]
-        email_domain = email.split("@")[1]
+        prefix, email_domain = email.split("@", 1)
 
+        # Must be on the company's own domain
+        if domain_base not in email_domain and email_domain not in domain_base:
+            continue
         # Skip noreply / automated addresses
         if any(prefix.startswith(ig) for ig in _IGNORE_PREFIXES):
             continue
-        # Skip example / placeholder emails
+        # Skip obvious placeholders
         if "example" in email or "yourcompany" in email:
             continue
-        # Prefer emails on the company's own domain
-        if domain_base in email_domain or email_domain in domain_base:
-            results.insert(0, email)  # prioritise own-domain emails
-        else:
-            results.append(email)
+
+        results.append(email)
 
     return results
+
+
+# Keep old name as alias so existing tests that import it still pass
+def _extract_emails_from_html(html: str, domain: str) -> list[str]:
+    return _extract_own_domain_emails(html, domain)
 
 
 def _pick_best_email(emails: list[str]) -> str:
