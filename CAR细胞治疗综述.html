@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CAR-T / CAR-M 细胞治疗综述</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* === THEME TOKENS === */
+:root {
+  --teal-900:#0A6B60; --teal-700:#0D9488; --teal-500:#14B8A6;
+  --teal-200:#99F6E4; --teal-100:#CCFBF1; --teal-50:#F0FDF9;
+  --navy:#0D2240; --navy-2:#1A3A5C;
+  --blue:#1A5FA0; --blue-lt:#DBEAFE;
+  --red:#DC2626; --red-lt:#FEE2E2;
+  --amber:#D97706; --amber-lt:#FEF3C7;
+  --green:#16A34A;
+  --gray-800:#1F2937; --gray-700:#374151; --gray-600:#4B5563;
+  --gray-500:#6B7280; --gray-400:#9CA3AF;
+  --gray-300:#D1D5DB; --gray-200:#E5E7EB; --gray-100:#F3F4F6;
+  --white:#FFFFFF; --canvas:#FAFFFE;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+
+/* === VIEWPORT BASE CSS (mandatory, verbatim) === */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#C8E6E2}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:#C8E6E2}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--canvas)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;visibility:hidden;opacity:0;pointer-events:none;background:var(--canvas)}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1}
+img,video,canvas,svg{max-width:100%;max-height:100%}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000}
+@media print{html,body{width:1920px;height:auto;overflow:visible;background:#fff}.deck-viewport{position:static;overflow:visible;background:#fff}.deck-stage{position:static;width:auto;height:auto;transform:none!important;background:none}.slide{position:relative;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;width:1920px;height:1080px;break-after:page;page-break-after:always}.slide:last-child{break-after:auto;page-break-after:auto}.deck-controls{display:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.2s!important}}
+
+/* === GLOBAL === */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* === TOP BAR === */
+.top-bar{position:absolute;top:0;left:0;right:0;height:80px;background:var(--teal-700);display:flex;align-items:center;padding:0 56px;justify-content:space-between;z-index:10}
+.top-left{display:flex;align-items:center;gap:18px}
+.slide-num{font-family:'Outfit',sans-serif;font-size:19px;font-weight:800;color:rgba(255,255,255,.3);letter-spacing:.06em}
+.top-sep{width:1px;height:24px;background:rgba(255,255,255,.22)}
+.slide-tag{font-family:'Outfit','Noto Sans SC',sans-serif;font-size:24px;font-weight:700;color:rgba(255,255,255,.97);letter-spacing:.01em}
+.top-right{display:flex;align-items:center;gap:14px}
+.top-meta{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.1em;text-transform:uppercase}
+
+/* === BOTTOM BAR === */
+.bottom-bar{position:absolute;bottom:0;left:0;right:0;height:96px;background:var(--teal-50);border-top:1.5px solid var(--teal-100);display:flex;align-items:center;padding:0 56px;gap:0;z-index:10}
+.cites{display:flex;gap:36px;align-items:flex-start}
+.cit{display:flex;gap:8px;align-items:flex-start;max-width:600px}
+.cn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--teal-700);flex-shrink:0;margin-top:1px}
+.ct{font-family:'Noto Sans SC',sans-serif;font-size:12.5px;color:var(--gray-500);line-height:1.45}
+
+/* === 3-COLUMN GRID BODY ===
+   cols: 548px | 1fr | 1fr  gap: 44px  pad: 28px 56px
+   each 1fr ≈ (1920-112-88-548)/2 = 586px
+*/
+.slide-body{position:absolute;top:80px;bottom:96px;left:0;right:0;display:grid;grid-template-columns:548px 1fr 1fr;column-gap:44px;padding:28px 56px;align-items:start}
+
+/* left: border-right visual divider */
+.diag-col{height:860px;overflow:hidden;display:flex;flex-direction:column;gap:12px;border-right:1.5px solid var(--teal-100);padding-right:28px}
+.txt-col{height:860px;overflow:hidden;display:flex;flex-direction:column;gap:11px}
+
+/* === TYPOGRAPHY === */
+.s-head{font-family:'Outfit','Noto Sans SC',sans-serif;font-size:14px;font-weight:800;color:var(--teal-900);letter-spacing:.09em;text-transform:uppercase;border-left:3px solid var(--teal-500);padding-left:9px;line-height:1.2}
+.sub-head{font-family:'Outfit','Noto Sans SC',sans-serif;font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:7px}
+.sub-head::before{content:'';display:block;width:13px;height:1.5px;background:var(--teal-500);flex-shrink:0}
+.body{font-family:'Noto Sans SC',sans-serif;font-size:15px;color:var(--gray-700);line-height:1.65}
+.body strong{color:var(--navy);font-weight:700}
+.body em{color:var(--teal-700);font-style:normal;font-weight:500}
+
+/* === BULLET LIST === */
+.blist{list-style:none;display:flex;flex-direction:column;gap:6px}
+.blist li{font-family:'Noto Sans SC',sans-serif;font-size:14.5px;color:var(--gray-700);line-height:1.55;padding-left:16px;position:relative}
+.blist li::before{content:'▸';position:absolute;left:0;color:var(--teal-500);font-size:10px;top:3px}
+.blist li strong{color:var(--navy);font-weight:700}
+.blist li em{color:var(--teal-700);font-style:normal;font-weight:500}
+
+/* === NUMBERED LIST === */
+.nlist{list-style:none;display:flex;flex-direction:column;gap:7px;counter-reset:nc}
+.nlist li{font-family:'Noto Sans SC',sans-serif;font-size:14.5px;color:var(--gray-700);line-height:1.5;padding-left:28px;position:relative;counter-increment:nc}
+.nlist li::before{content:counter(nc);position:absolute;left:0;top:1px;width:19px;height:19px;background:var(--teal-700);color:white;border-radius:50%;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.nlist li strong{color:var(--navy);font-weight:700}
+
+/* === STAT MINI BOXES === */
+.stat-row{display:flex;gap:9px}
+.stat-box{flex:1;background:white;border:1px solid var(--gray-200);border-top:3px solid var(--teal-500);padding:9px 11px;min-width:0}
+.stat-box.b{border-top-color:var(--blue)}.stat-box.a{border-top-color:var(--amber)}.stat-box.n{border-top-color:var(--navy)}
+.stat-n{font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;color:var(--teal-700);line-height:1;margin-bottom:2px}
+.stat-box.b .stat-n{color:var(--blue)}.stat-box.a .stat-n{color:var(--amber)}.stat-box.n .stat-n{color:var(--navy)}
+.stat-l{font-family:'Noto Sans SC',sans-serif;font-size:11px;color:var(--gray-600);line-height:1.3}
+
+/* === PIPELINE TABLE === */
+.pipe-tbl{width:100%;border-collapse:collapse}
+.pipe-tbl th{font-family:'Outfit','Noto Sans SC',sans-serif;font-size:11.5px;font-weight:700;color:white;background:var(--navy);padding:7px 9px;text-align:left;letter-spacing:.04em;text-transform:uppercase}
+.pipe-tbl td{font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--gray-700);padding:5px 9px;border-bottom:1px solid var(--gray-200);line-height:1.35;vertical-align:top}
+.pipe-tbl tr:nth-child(even) td{background:#F8FFFD}
+.pipe-tbl tr:last-child td{border-bottom:none}
+.bdg{display:inline-block;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:1px 5px;border-radius:2px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
+.lv{background:var(--blue-lt);color:var(--blue)}.ln{background:var(--teal-100);color:var(--teal-900)}.ph{background:var(--amber-lt);color:var(--amber)}
+
+/* === CALLOUT === */
+.callout{border-left:4px solid var(--teal-500);background:var(--teal-50);padding:10px 13px;border-radius:0 4px 4px 0}
+.callout.a{border-left-color:var(--amber);background:var(--amber-lt)}
+.callout.r{border-left-color:var(--red);background:var(--red-lt)}
+.callout.n{border-left-color:var(--navy);background:var(--blue-lt)}
+.c-title{font-family:'Outfit','Noto Sans SC',sans-serif;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.c-body{font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--gray-600);line-height:1.5}
+.c-body strong{color:var(--navy);font-weight:700}
+
+/* === CLINICAL TABLE === */
+.clin-tbl{width:100%;border-collapse:collapse}
+.clin-tbl th{font-family:'Outfit','Noto Sans SC',sans-serif;font-size:11.5px;font-weight:700;color:var(--navy-2);background:rgba(13,148,136,.08);padding:6px 9px;text-align:left;border-bottom:2px solid var(--teal-200)}
+.clin-tbl td{font-family:'Noto Sans SC',sans-serif;font-size:13px;color:var(--gray-700);padding:6px 9px;border-bottom:1px solid var(--gray-200);line-height:1.35;vertical-align:middle}
+.clin-tbl tr:last-child td{border-bottom:none}
+.ok{color:var(--green);font-weight:700;font-size:12px}
+.sd{color:var(--amber);font-weight:700;font-size:12px}
+.end{color:var(--red);font-weight:700;font-size:12px}
+
+/* === DIAGRAM LABEL === */
+.d-label{font-family:'Outfit','Noto Sans SC',sans-serif;font-size:12.5px;font-weight:700;color:var(--teal-700);letter-spacing:.1em;text-transform:uppercase;text-align:center}
+
+/* === ENTRANCE ANIMATIONS === */
+.slide.active .reveal{animation:fi 0.5s var(--ease) both}
+.slide.active .reveal:nth-child(1){animation-delay:.04s}
+.slide.active .reveal:nth-child(2){animation-delay:.12s}
+.slide.active .reveal:nth-child(3){animation-delay:.20s}
+.slide.active .reveal:nth-child(4){animation-delay:.28s}
+.slide.active .reveal:nth-child(5){animation-delay:.36s}
+.slide.active .reveal:nth-child(6){animation-delay:.44s}
+@keyframes fi{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+
+/* === INLINE EDIT === */
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:18px;left:18px;background:var(--teal-700);color:white;border:none;border-radius:6px;padding:6px 13px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;z-index:10001;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+[contenteditable="true"]{outline:2px solid var(--teal-500);border-radius:2px;cursor:text}
+
+/* === NAV HINT === */
+.nav-hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);font-family:'Outfit',sans-serif;font-size:12px;color:rgba(13,148,136,.5);letter-spacing:.07em;z-index:100;user-select:none;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 1 — CAR-T 细胞治疗：技术演进与范式跃迁
+     ══════════════════════════════════════════════════════ -->
+<section class="slide active" id="s1">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="top-left">
+      <span class="slide-num">01 / 02</span>
+      <div class="top-sep"></div>
+      <span class="slide-tag">CAR-T 细胞治疗：技术演进与范式跃迁</span>
+    </div>
+    <div class="top-right">
+      <span class="top-meta">临床与注册中心</span>
+      <span class="top-meta" style="color:rgba(255,255,255,.3)">·</span>
+      <span class="top-meta">2025</span>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="slide-body">
+
+    <!-- ── LEFT: Diagram Column ── -->
+    <div class="diag-col">
+
+      <!-- Diagram label -->
+      <div class="d-label reveal">CAR 基本结构示意图</div>
+
+      <!-- SVG: CAR-T mechanism -->
+      <svg viewBox="0 0 520 295" width="100%" style="flex-shrink:0" aria-label="CAR-T结构示意图">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#6B7280"/>
+          </marker>
+          <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#DC2626"/>
+          </marker>
+        </defs>
+
+        <!-- T Cell main circle -->
+        <circle cx="170" cy="160" r="128" fill="rgba(13,148,136,.07)" stroke="#0D9488" stroke-width="2.5"/>
+
+        <!-- Nucleus (dashed oval) -->
+        <ellipse cx="152" cy="172" rx="58" ry="46" fill="rgba(26,95,160,.09)" stroke="#1A5FA0" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+        <!-- T cell label -->
+        <text x="95" y="132" font-family="Outfit,Noto Sans SC,sans-serif" font-size="17" font-weight="700" fill="#0D9488">T 细胞</text>
+        <!-- Nucleus label -->
+        <text x="152" y="177" font-family="Noto Sans SC,sans-serif" font-size="12" fill="#1A5FA0" text-anchor="middle">细胞核</text>
+
+        <!-- ── CAR Construct (horizontal, extending right from cell surface x=298) ── -->
+        <!-- CD3ζ + CD28 intracellular domain (inside cell) -->
+        <rect x="220" y="146" width="76" height="30" rx="4" fill="#0D2240"/>
+        <text x="258" y="158" font-family="Outfit,sans-serif" font-size="10.5" font-weight="700" fill="white" text-anchor="middle">CD3ζ</text>
+        <text x="258" y="171" font-family="Outfit,sans-serif" font-size="9.5" fill="#93C5FD" text-anchor="middle">CD28/4-1BB</text>
+
+        <!-- Transmembrane domain (straddles membrane at x=298) -->
+        <rect x="296" y="146" width="26" height="30" fill="#0D9488"/>
+        <text x="309" y="165" font-family="Outfit,sans-serif" font-size="9" fill="white" text-anchor="middle" transform="rotate(-90,309,165)">TM</text>
+
+        <!-- Hinge region -->
+        <rect x="322" y="151" width="20" height="20" rx="3" fill="#99F6E4" stroke="#14B8A6" stroke-width="1"/>
+
+        <!-- scFv (extracellular) -->
+        <circle cx="364" cy="161" r="21" fill="white" stroke="#14B8A6" stroke-width="2.5"/>
+        <text x="364" y="157" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#0D2240" text-anchor="middle">sc</text>
+        <text x="364" y="169" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#0D2240" text-anchor="middle">Fv</text>
+
+        <!-- Arrow from scFv to antigen -->
+        <line x1="386" y1="161" x2="418" y2="161" stroke="#6B7280" stroke-width="2" marker-end="url(#arr)"/>
+        <text x="402" y="177" font-family="Noto Sans SC,sans-serif" font-size="10" fill="#9CA3AF" text-anchor="middle">MHC非依赖</text>
+
+        <!-- Cancer cell -->
+        <ellipse cx="476" cy="161" rx="52" ry="46" fill="rgba(220,38,38,.06)" stroke="#DC2626" stroke-width="2" stroke-dasharray="6,3"/>
+        <!-- Antigen on cancer cell surface -->
+        <circle cx="422" cy="161" r="10" fill="#EF4444" opacity=".85"/>
+        <text x="422" y="148" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#DC2626" text-anchor="middle">Ag</text>
+        <!-- Cancer cell labels -->
+        <text x="476" y="157" font-family="Noto Sans SC,sans-serif" font-size="15" font-weight="700" fill="#DC2626" text-anchor="middle">肿瘤</text>
+        <text x="476" y="172" font-family="Noto Sans SC,sans-serif" font-size="11.5" fill="#DC2626" text-anchor="middle">靶细胞</text>
+
+        <!-- ── Annotation leader lines ── -->
+        <!-- scFv: upward leader -->
+        <line x1="364" y1="140" x2="364" y2="28" stroke="#D1D5DB" stroke-width="1"/>
+        <text x="364" y="22" font-family="Noto Sans SC,sans-serif" font-size="12.5" fill="#6B7280" text-anchor="middle">scFv 抗原结合域</text>
+
+        <!-- Hinge: upward-left leader -->
+        <line x1="332" y1="151" x2="315" y2="30" stroke="#D1D5DB" stroke-width="1"/>
+        <text x="306" y="23" font-family="Noto Sans SC,sans-serif" font-size="12" fill="#6B7280" text-anchor="end">铰链区</text>
+
+        <!-- TM: downward leader -->
+        <line x1="309" y1="176" x2="309" y2="220" stroke="#D1D5DB" stroke-width="1"/>
+        <text x="309" y="231" font-family="Noto Sans SC,sans-serif" font-size="12" fill="#6B7280" text-anchor="middle">跨膜区</text>
+
+        <!-- CD3ζ: downward leader -->
+        <line x1="258" y1="176" x2="258" y2="220" stroke="#D1D5DB" stroke-width="1"/>
+        <text x="258" y="231" font-family="Noto Sans SC,sans-serif" font-size="12" fill="#6B7280" text-anchor="middle">胞内信号域</text>
+        <text x="258" y="246" font-family="Outfit,sans-serif" font-size="11" fill="#9CA3AF" text-anchor="middle">CD3ζ + CD28/4-1BB</text>
+
+        <!-- "五代迭代" callout bar -->
+        <rect x="0" y="268" width="520" height="24" rx="3" fill="rgba(13,148,136,.07)"/>
+        <text x="8" y="284" font-family="Noto Sans SC,sans-serif" font-size="12.5" fill="#0D9488" font-weight="500">CAR 结构已历经五代迭代优化 · 第四/五代引入细胞因子分泌及通用型设计</text>
+      </svg>
+
+      <!-- In vivo delivery comparison -->
+      <div class="d-label reveal" style="margin-top:4px">体内递送策略对比（In Vivo）</div>
+
+      <!-- SVG: LVV vs mRNA-LNP -->
+      <svg viewBox="0 0 520 128" width="100%" style="flex-shrink:0" aria-label="体内递送策略对比">
+        <!-- LVV panel -->
+        <rect x="0" y="0" width="245" height="120" rx="5" fill="var(--blue-lt)" stroke="#1A5FA0" stroke-width="1"/>
+        <!-- Virus icon -->
+        <circle cx="40" cy="60" r="26" fill="white" stroke="#1A5FA0" stroke-width="2"/>
+        <!-- Virus spikes -->
+        <line x1="40" y1="32" x2="40" y2="22" stroke="#1A5FA0" stroke-width="2"/>
+        <line x1="40" y1="88" x2="40" y2="98" stroke="#1A5FA0" stroke-width="2"/>
+        <line x1="68" y1="60" x2="78" y2="60" stroke="#1A5FA0" stroke-width="2"/>
+        <line x1="12" y1="60" x2="2" y2="60" stroke="#1A5FA0" stroke-width="2"/>
+        <line x1="60" y1="40" x2="67" y2="33" stroke="#1A5FA0" stroke-width="2"/>
+        <line x1="20" y1="80" x2="13" y2="87" stroke="#1A5FA0" stroke-width="2"/>
+        <circle cx="40" cy="60" r="10" fill="#1A5FA0" opacity=".2"/>
+        <text x="40" y="57" font-family="Outfit,sans-serif" font-size="9" font-weight="800" fill="#1A5FA0" text-anchor="middle">LVV</text>
+        <!-- LVV text block -->
+        <text x="76" y="24" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#1D4ED8">慢病毒载体路线</text>
+        <text x="76" y="42" font-family="Noto Sans SC,sans-serif" font-size="11.5" fill="#374151">基因整合 · 持久稳定表达</text>
+        <text x="76" y="58" font-family="Noto Sans SC,sans-serif" font-size="11.5" fill="#374151">T细胞靶向假型化设计</text>
+        <text x="76" y="78" font-family="Noto Sans SC,sans-serif" font-size="10.5" fill="#6B7280">代表：INT2104 · ESO-T01</text>
+        <text x="76" y="92" font-family="Noto Sans SC,sans-serif" font-size="10.5" fill="#6B7280">UB-VV111（Umoja）</text>
+        <text x="76" y="110" font-family="Outfit,sans-serif" font-size="10" font-weight="700" fill="#1A5FA0">首个人体临床验证 PoC ✓</text>
+
+        <!-- vs -->
+        <text x="260" y="68" font-family="Outfit,sans-serif" font-size="17" font-weight="800" fill="#D1D5DB" text-anchor="middle">VS</text>
+
+        <!-- mRNA-LNP panel -->
+        <rect x="275" y="0" width="245" height="120" rx="5" fill="var(--teal-50)" stroke="#0D9488" stroke-width="1"/>
+        <!-- LNP icon (layered circles) -->
+        <circle cx="40+275" cy="60" r="26" fill="white" stroke="#0D9488" stroke-width="2"/>
+        <circle cx="315" cy="60" r="18" fill="rgba(13,148,136,.12)" stroke="#0D9488" stroke-width="1.5"/>
+        <circle cx="315" cy="60" r="10" fill="rgba(13,148,136,.25)"/>
+        <text x="315" y="57" font-family="Outfit,sans-serif" font-size="7.5" font-weight="800" fill="#0D9488" text-anchor="middle">mRNA</text>
+        <text x="315" y="66" font-family="Outfit,sans-serif" font-size="7.5" fill="#0D9488" text-anchor="middle">LNP</text>
+        <!-- LNP text block -->
+        <text x="351" y="24" font-family="Outfit,sans-serif" font-size="13" font-weight="800" fill="#0F766E">mRNA-LNP 路线</text>
+        <text x="351" y="42" font-family="Noto Sans SC,sans-serif" font-size="11.5" fill="#374151">瞬时表达 · 可重复给药</text>
+        <text x="351" y="58" font-family="Noto Sans SC,sans-serif" font-size="11.5" fill="#374151">无整合致癌风险 · 可规模化生产</text>
+        <text x="351" y="78" font-family="Noto Sans SC,sans-serif" font-size="10.5" fill="#6B7280">代表：CPTX2309 · SYS6020</text>
+        <text x="351" y="92" font-family="Noto Sans SC,sans-serif" font-size="10.5" fill="#6B7280">HN2301（NEJM SLE 2025.09）</text>
+        <text x="351" y="110" font-family="Outfit,sans-serif" font-size="10" font-weight="700" fill="#0D9488">mRNA/LNP 疫苗平台高度复用 ✓</text>
+      </svg>
+
+      <!-- Stat boxes -->
+      <div class="stat-row reveal">
+        <div class="stat-box"><div class="stat-n">&gt;14</div><div class="stat-l">全球累计获批产品<br>截至 2025 年底</div></div>
+        <div class="stat-box n"><div class="stat-n">7</div><div class="stat-l">中国本土获批<br>覆盖血液瘤多适应症</div></div>
+        <div class="stat-box a"><div class="stat-n">$21亿</div><div class="stat-l">AbbVie 收购 Capstan<br>战略价值验证信号</div></div>
+      </div>
+
+    </div><!-- /diag-col -->
+
+    <!-- ── TEXT COLUMN 1 ── -->
+    <div class="txt-col">
+
+      <div class="s-head reveal">技术背景与演进</div>
+
+      <p class="body reveal"><strong>CAR 基本结构</strong>由胞外 <em>scFv 抗原结合域</em>、铰链区、跨膜区与胞内信号区（CD3ζ 及共刺激域 CD28/4-1BB）四部分组成，已历经五代迭代优化。其核心优势在于：无需 MHC 呈递，直接识别靶抗原，绕过肿瘤免疫逃逸机制。</p>
+
+      <div class="sub-head reveal">全球格局</div>
+      <ul class="blist reveal">
+        <li><strong>2017 年</strong>美国 FDA 批准全球首款 CAR-T 产品（Kymriah）</li>
+        <li>截至 2025 年底，全球获批 <em>&gt;14 款</em>，中国本土 <em>7 款</em>上市</li>
+        <li>适应症覆盖 DLBCL · B-ALL · MM，加速向实体瘤、自身免疫病延展</li>
+      </ul>
+
+      <div class="s-head reveal" style="margin-top:6px">传统 Ex Vivo 制约</div>
+      <p class="body reveal">患者白细胞单采 → 体外转导扩增 → 质控放行 → 回输，整个链条存在系统性制约：</p>
+      <ul class="blist reveal">
+        <li><strong>周期长：</strong>2–4 周制备，病情进展患者难以等待</li>
+        <li><strong>成本高：</strong>单次治疗数十万至逾百万人民币，支付体系压力大</li>
+        <li><strong>可及性差：</strong>依赖冷链 + 单中心制造，规模化推广受限</li>
+        <li><strong>个体差异：</strong>T 细胞质量因人而异，疗效波动显著</li>
+      </ul>
+
+      <div class="callout reveal">
+        <div class="c-title">In vivo 范式意义</div>
+        <div class="c-body">June CH 等（Nat Rev Drug Discov, 2026）指出：<strong>体内工程化彻底省略 ex vivo 操作</strong>，早期临床研究已证明体内递送可实现高效转导、持续 CAR 表达及初步抗肿瘤活性，建立了临床概念验证（PoC）。</div>
+      </div>
+
+    </div><!-- /txt-col 1 -->
+
+    <!-- ── TEXT COLUMN 2 ── -->
+    <div class="txt-col">
+
+      <div class="s-head reveal">In Vivo CAR-T：两条并行技术路径</div>
+
+      <div class="sub-head reveal">① 慢病毒载体路线（LVV）</div>
+      <table class="pipe-tbl reveal">
+        <thead>
+          <tr><th>产品 / 公司</th><th>特点</th><th>状态</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>INT2104</strong><br><span style="color:var(--gray-500);font-size:12px">Interius BioTherapeutics</span></td>
+            <td>CD7 靶向 VSV-G 变体<br>全球首个 in vivo CAR-T 人体临床</td>
+            <td><span class="bdg ph">Phase I</span></td>
+          </tr>
+          <tr>
+            <td><strong>ESO-T01</strong><br><span style="color:var(--gray-500);font-size:12px">EsoBiotec</span></td>
+            <td>Nipah 病毒糖蛋白假型化<br>高效 T 细胞靶向转导</td>
+            <td><span class="bdg ph">IND</span></td>
+          </tr>
+          <tr>
+            <td><strong>UB-VV111</strong><br><span style="color:var(--gray-500);font-size:12px">Umoja Biopharma</span></td>
+            <td>CD4/CD8 双靶向<br>原位制造平台</td>
+            <td><span class="bdg lv">Pre-IND</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="sub-head reveal">② mRNA-LNP 路线（非病毒）</div>
+      <table class="pipe-tbl reveal">
+        <thead>
+          <tr><th>产品 / 公司</th><th>特点</th><th>状态</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>CPTX2309</strong><br><span style="color:var(--gray-500);font-size:12px">Capstan → AbbVie</span></td>
+            <td>靶向 tLNP，CD19 CAR-T<br>AbbVie <strong>$21 亿</strong>战略收购</td>
+            <td><span class="bdg ph">Phase I</span></td>
+          </tr>
+          <tr>
+            <td><strong>SYS6020</strong><br><span style="color:var(--gray-500);font-size:12px">石药集团</span></td>
+            <td>国内首个获 IND 批件<br>mRNA-LNP in vivo CAR-T</td>
+            <td><span class="bdg ph">IND ✓</span></td>
+          </tr>
+          <tr>
+            <td><strong>HN2301</strong><br><span style="color:var(--gray-500);font-size:12px">虹信生物</span></td>
+            <td>2025.09 NEJM 首个 SLE<br>人体数据发表</td>
+            <td><span class="bdg ln">Phase I</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout n reveal">
+        <div class="c-title">CDE 监管视角（周宇等，2025）</div>
+        <div class="c-body">国家药监局 CDE 已系统梳理 in vivo CAR-T 技术进展与<strong>非临床研究核心考量框架</strong>，为监管路径提供方向性指引。（中国药物评价，42(6)：409–415）</div>
+      </div>
+
+    </div><!-- /txt-col 2 -->
+
+  </div><!-- /slide-body -->
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <div class="cites">
+      <div class="cit"><span class="cn">①</span><span class="ct">June CH, et al. In vivo chimeric antigen receptor (CAR)-T cell therapy. <em>Nat Rev Drug Discov.</em> 2026;25:116–137. DOI: 10.1038/s41573-025-01291-5</span></div>
+      <div class="cit"><span class="cn">②</span><span class="ct">周宇, 张旻, 闫莉萍. 体内 CAR-T 研究进展及非临床研究一般考虑. <em>中国药物评价.</em> 2025, 42(6): 409–415</span></div>
+    </div>
+  </div>
+
+</section><!-- /slide 1 -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 2 — CAR-M 细胞治疗：机理优势与路径重塑
+     ══════════════════════════════════════════════════════ -->
+<section class="slide" id="s2">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="top-left">
+      <span class="slide-num">02 / 02</span>
+      <div class="top-sep"></div>
+      <span class="slide-tag">CAR-M 细胞治疗：机理优势与路径重塑</span>
+    </div>
+    <div class="top-right">
+      <span class="top-meta">临床与注册中心</span>
+      <span class="top-meta" style="color:rgba(255,255,255,.3)">·</span>
+      <span class="top-meta">2025</span>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="slide-body">
+
+    <!-- ── LEFT: Diagram Column ── -->
+    <div class="diag-col">
+
+      <div class="d-label reveal">CAR-M 作用机制示意图</div>
+
+      <!-- SVG: CAR-M mechanism -->
+      <svg viewBox="0 0 520 330" width="100%" style="flex-shrink:0" aria-label="CAR-M作用机制">
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#0D9488"/>
+          </marker>
+          <marker id="arr3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#1A5FA0"/>
+          </marker>
+        </defs>
+
+        <!-- LNP delivery icon (in vivo, top-left) -->
+        <circle cx="36" cy="38" r="24" fill="rgba(13,148,136,.08)" stroke="#0D9488" stroke-width="1.5"/>
+        <circle cx="36" cy="38" r="15" fill="rgba(13,148,136,.15)" stroke="#0D9488" stroke-width="1"/>
+        <circle cx="36" cy="38" r="8" fill="rgba(13,148,136,.3)"/>
+        <text x="36" y="35" font-family="Outfit,sans-serif" font-size="7" font-weight="800" fill="#0D9488" text-anchor="middle">mRNA</text>
+        <text x="36" y="43" font-family="Outfit,sans-serif" font-size="7" fill="#0D9488" text-anchor="middle">LNP</text>
+        <text x="36" y="72" font-family="Noto Sans SC,sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">体内递送</text>
+        <!-- Arrow from LNP to macrophage -->
+        <line x1="62" y1="38" x2="88" y2="70" stroke="#0D9488" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr2)"/>
+
+        <!-- ── Macrophage (irregular blob path) ── -->
+        <path d="M 190 55 C 245 45, 290 75, 310 130 C 330 185, 315 248, 268 278 C 221 308, 155 305, 118 270 C 81 235, 72 182, 84 138 C 96 94, 128 66, 190 55 Z"
+              fill="rgba(13,148,136,.09)" stroke="#0D9488" stroke-width="2.5"/>
+
+        <!-- Macrophage label -->
+        <text x="168" y="90" font-family="Noto Sans SC,sans-serif" font-size="15" font-weight="700" fill="#0D9488" text-anchor="middle">巨噬细胞</text>
+        <text x="168" y="107" font-family="Outfit,sans-serif" font-size="12" fill="#0D9488" text-anchor="middle">(CAR-Macrophage)</text>
+
+        <!-- Pseudo-nucleus -->
+        <ellipse cx="165" cy="185" rx="52" ry="42" fill="rgba(26,95,160,.08)" stroke="#1A5FA0" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="165" y="190" font-family="Noto Sans SC,sans-serif" font-size="11" fill="#1A5FA0" text-anchor="middle">细胞核</text>
+
+        <!-- CAR receptor on macrophage surface (right side, ~x=312) -->
+        <!-- Intracellular tail -->
+        <rect x="266" y="145" width="38" height="22" rx="3" fill="#0D2240"/>
+        <text x="285" y="160" font-family="Outfit,sans-serif" font-size="8.5" fill="white" text-anchor="middle">γ-chain</text>
+        <!-- TM -->
+        <rect x="304" y="145" width="16" height="22" fill="#0D9488"/>
+        <!-- scFv arm -->
+        <rect x="320" y="149" width="14" height="14" rx="2" fill="#99F6E4" stroke="#14B8A6" stroke-width="1"/>
+        <circle cx="345" cy="156" r="13" fill="white" stroke="#14B8A6" stroke-width="2"/>
+        <text x="345" y="153" font-family="Outfit,sans-serif" font-size="8" font-weight="700" fill="#0D2240" text-anchor="middle">sc</text>
+        <text x="345" y="162" font-family="Outfit,sans-serif" font-size="8" font-weight="700" fill="#0D2240" text-anchor="middle">Fv</text>
+        <!-- CAR label above -->
+        <text x="315" y="135" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#0D9488" text-anchor="middle">CAR</text>
+        <line x1="315" y1="137" x2="315" y2="145" stroke="#0D9488" stroke-width="1"/>
+
+        <!-- Cancer cell being engulfed (right of macrophage) -->
+        <circle cx="398" cy="160" r="42" fill="rgba(220,38,38,.06)" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="398" y="156" font-family="Noto Sans SC,sans-serif" font-size="13.5" font-weight="700" fill="#DC2626" text-anchor="middle">肿瘤</text>
+        <text x="398" y="171" font-family="Noto Sans SC,sans-serif" font-size="11" fill="#DC2626" text-anchor="middle">靶细胞</text>
+        <!-- Phagocytosis arc indicator -->
+        <path d="M 356 180 Q 335 200, 315 230" stroke="#0D9488" stroke-width="2" fill="none" stroke-dasharray="3,2" marker-end="url(#arr2)"/>
+        <text x="320" y="248" font-family="Noto Sans SC,sans-serif" font-size="11" fill="#0D9488">吞噬</text>
+
+        <!-- ── 3 output arrows (downstream effects) ── -->
+        <!-- Arrow 1: M1 polarization (upper right) -->
+        <line x1="318" y1="115" x2="418" y2="88" stroke="#0D9488" stroke-width="2" marker-end="url(#arr2)"/>
+        <text x="425" y="80" font-family="Noto Sans SC,sans-serif" font-size="12.5" fill="#0D9488" font-weight="700">M1 极化</text>
+        <text x="425" y="94" font-family="Noto Sans SC,sans-serif" font-size="11" fill="#6B7280">抑制性 TME → 促炎</text>
+
+        <!-- Arrow 2: Antigen presentation (right) -->
+        <line x1="318" y1="178" x2="418" y2="178" stroke="#1A5FA0" stroke-width="2" marker-end="url(#arr3)"/>
+        <text x="425" y="174" font-family="Noto Sans SC,sans-serif" font-size="12.5" fill="#1A5FA0" font-weight="700">抗原提呈</text>
+        <text x="425" y="188" font-family="Noto Sans SC,sans-serif" font-size="11" fill="#6B7280">MHC-II 激活 T 细胞</text>
+
+        <!-- Arrow 3: CD8+ T activation (lower right) -->
+        <line x1="308" y1="240" x2="418" y2="270" stroke="#0D9488" stroke-width="2" marker-end="url(#arr2)"/>
+        <!-- CD8+ T cell icon -->
+        <circle cx="455" cy="278" r="26" fill="rgba(26,95,160,.1)" stroke="#1A5FA0" stroke-width="1.5"/>
+        <text x="455" y="275" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="#1A5FA0" text-anchor="middle">CD8⁺</text>
+        <text x="455" y="288" font-family="Noto Sans SC,sans-serif" font-size="10" fill="#1A5FA0" text-anchor="middle">T 细胞激活</text>
+
+        <!-- Multi-effect label -->
+        <text x="190" y="320" font-family="Noto Sans SC,sans-serif" font-size="11.5" fill="#0D9488" text-anchor="middle" font-weight="500">吞噬 · M1极化 · 抗原提呈 · CD8⁺T激活——多重效应叠加</text>
+      </svg>
+
+      <!-- CT-0508 clinical data table -->
+      <div class="d-label reveal">CT-0508 首个 CAR-M I 期（HER2, Nature Medicine 2025）</div>
+      <table class="clin-tbl reveal">
+        <thead><tr><th>评估维度</th><th>关键结果</th></tr></thead>
+        <tbody>
+          <tr><td>安全性</td><td><span class="ok">✓ 无 DLT</span> · <span class="ok">无 ≥3 级 CRS</span></td></tr>
+          <tr><td>归巢 &amp; TME</td><td>CAR-M 确认归巢肿瘤 · 重塑 TME · CD8⁺ 扩增</td></tr>
+          <tr><td>最佳疗效</td><td><span class="sd">SD 4/9</span>（HER2 3+ 患者）· <span class="end">0 PR/CR</span></td></tr>
+          <tr><td>项目命运</td><td><span class="end">✗</span> CT-0508 终止（2024.04）· CT-0525 终止（2024.12）</td></tr>
+        </tbody>
+      </table>
+
+    </div><!-- /diag-col -->
+
+    <!-- ── TEXT COLUMN 1 ── -->
+    <div class="txt-col">
+
+      <div class="s-head reveal">CAR-M 理论优势</div>
+      <ul class="blist reveal">
+        <li><strong>实体瘤浸润：</strong>巨噬细胞天然具备高效浸润实体瘤组织的能力，突破 CAR-T 的实体瘤屏障难题</li>
+        <li><strong>M1 极化：</strong>将抑制性 TME 转变为促炎微环境，逆转免疫抑制</li>
+        <li><strong>CD8⁺ 激活：</strong>通过 MHC-II 抗原提呈激活内源性 CD8⁺ T 细胞，形成二次免疫攻击</li>
+        <li><strong>多重效应叠加：</strong>吞噬 + 极化 + 提呈 + T 细胞激活协同发挥抗肿瘤作用</li>
+      </ul>
+
+      <div class="s-head reveal" style="margin-top:4px">Ex Vivo CAR-M 四大系统性挑战</div>
+      <ol class="nlist reveal">
+        <li><strong>剂量暴露受限——</strong>巨噬细胞为终末分化非分裂细胞，体内不扩增，单次回输"暴露量"远低于 CAR-T，是疗效受限的根本原因</li>
+        <li><strong>制造工艺不成熟——</strong>Ad5f35 腺病毒对巨噬细胞转导效率有限；GMP 级培养与冻存尚无成熟规范</li>
+        <li><strong>体内持久性差——</strong>CAR-M 通常仅维持 1–3 周，无法形成持续免疫监控</li>
+        <li><strong>靶点竞争压力大——</strong>HER2、GPC3 等主要靶点已有 ADC · TCE · CAR-T 多类成熟产品占据</li>
+      </ol>
+
+      <div class="callout r reveal">
+        <div class="c-title">CT-0508 核心启示</div>
+        <div class="c-body">安全信号良好，归巢与 TME 重塑功能经临床验证；但<strong>疗效上限受限于不扩增特性</strong>，叠加 HER2 ADC 竞争压力，最终导致退出。ex vivo CAR-M 路径面临根本性瓶颈。</div>
+      </div>
+
+    </div><!-- /txt-col 1 -->
+
+    <!-- ── TEXT COLUMN 2 ── -->
+    <div class="txt-col">
+
+      <div class="s-head reveal">路径重塑：In Vivo CAR-M</div>
+
+      <div class="sub-head reveal">全球主要进展</div>
+      <ul class="blist reveal">
+        <li><strong>Carisma + Moderna：</strong>mRNA-LNP 递送靶向 GPC3 用于 HCC，临床前完成 PoC 验证</li>
+        <li><strong>Myeloid MT-302/MT-303：</strong>Carisma 退出后<em>全球唯一仍在独立运营</em>且进入临床的 in vivo CAR-M 项目</li>
+        <li><strong>元迈细胞 · 赛元生物：</strong>国内相继布局体内 CAR-M 方向，进入早期研究阶段</li>
+      </ul>
+
+      <div class="s-head reveal" style="margin-top:4px">中国战略机遇：GPC3 / HCC</div>
+
+      <div class="callout reveal">
+        <div class="c-title">生物学切入口：LNP 肝脏天然富集</div>
+        <div class="c-body">LNP 对<strong>肝脏具有天然靶向富集特性</strong>，配合肝内髓系细胞的高丰度，为 GPC3/HCC 方向的 in vivo CAR-M 提供独特生物学切入口。</div>
+      </div>
+
+      <ul class="blist reveal">
+        <li><strong>中国 HCC 发病率占全球 50% 以上</strong>，靶向治疗需求巨大而未被充分满足</li>
+        <li>GPC3 在 HCC 中高度过表达，靶点成药性经多条路线验证</li>
+        <li><strong>mRNA/LNP 疫苗平台与 in vivo CAR-M 技术架构高度重叠</strong>，具备 mRNA/LNP 制造能力的企业拥有天然战略优势</li>
+        <li>中国监管体系在 CDE 指引框架下为 in vivo 细胞治疗建立了路径参考</li>
+      </ul>
+
+      <div class="callout n reveal">
+        <div class="c-title">综合判断</div>
+        <div class="c-body">从 ex vivo 向 in vivo 的路径重塑是 CAR-M 领域的必然方向。<strong>GPC3/HCC + LNP 平台</strong>构成最具确定性的中国战略切入口，建议结合自身 mRNA/LNP 制造能力评估介入时机。</div>
+      </div>
+
+    </div><!-- /txt-col 2 -->
+
+  </div><!-- /slide-body -->
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <div class="cites">
+      <div class="cit"><span class="cn">①</span><span class="ct">Zhang Y, et al. CAR-Macrophage clinical advances and challenges. <em>Ann Hematol.</em> 2025;104(9):4305–4317</span></div>
+      <div class="cit"><span class="cn">②</span><span class="ct">June CH, et al. <em>Nat Rev Drug Discov.</em> 2026;25:116–137 · CDE 监管指引（周宇等）. <em>中国药物评价.</em> 2025, 42(6)</span></div>
+    </div>
+  </div>
+
+</section><!-- /slide 2 -->
+
+</main>
+</div><!-- /deck-viewport -->
+
+<!-- Inline edit controls -->
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle">✏ 编辑</button>
+
+<!-- Navigation hint -->
+<div class="nav-hint" id="navHint">← → 方向键 / 空格键 切换幻灯片 · 按 E 编辑文字</div>
+
+<script>
+/* ============================================================
+   SLIDE PRESENTATION CONTROLLER
+   ============================================================ */
+class SlidePresentation {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.current = 0;
+    this.stage = document.getElementById('deckStage');
+    this.hint = document.getElementById('navHint');
+    this.setupScale();
+    this.setupKeyboard();
+    this.setupTouch();
+    this.setupWheel();
+    this.show(0);
+    // Auto-hide nav hint after 4s
+    setTimeout(() => { if (this.hint) this.hint.style.opacity = '0'; }, 4000);
+  }
+
+  setupScale() {
+    const scale = () => {
+      const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      const x = (window.innerWidth  - 1920 * f) / 2;
+      const y = (window.innerHeight - 1080 * f) / 2;
+      this.stage.style.transform = `translate(${x}px,${y}px) scale(${f})`;
+    };
+    scale();
+    window.addEventListener('resize', scale);
+  }
+
+  setupKeyboard() {
+    document.addEventListener('keydown', (e) => {
+      if (e.target.getAttribute('contenteditable')) return;
+      if (['ArrowRight','ArrowDown','Space',' ','PageDown'].includes(e.key)||e.key==='Space') {
+        e.preventDefault(); this.next();
+      } else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) {
+        e.preventDefault(); this.prev();
+      } else if (e.key==='Home') {
+        e.preventDefault(); this.show(0);
+      } else if (e.key==='End') {
+        e.preventDefault(); this.show(this.slides.length-1);
+      } else if (e.key==='e'||e.key==='E') {
+        editor.toggleEditMode();
+      }
+    });
+  }
+
+  setupTouch() {
+    let sx=0, sy=0;
+    this.stage.addEventListener('touchstart', e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; }, {passive:true});
+    this.stage.addEventListener('touchend', e=>{
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) > Math.abs(dy) + 20) { dx < 0 ? this.next() : this.prev(); }
+    }, {passive:true});
+  }
+
+  setupWheel() {
+    let locked = false;
+    window.addEventListener('wheel', (e) => {
+      if (locked) return;
+      locked = true;
+      setTimeout(() => locked=false, 600);
+      e.deltaY > 0 ? this.next() : this.prev();
+    }, {passive:true});
+  }
+
+  show(idx) {
+    this.current = Math.max(0, Math.min(idx, this.slides.length-1));
+    this.slides.forEach((s, i) => {
+      const active = i === this.current;
+      s.classList.toggle('active', active);
+      s.classList.toggle('visible', active);
+    });
+  }
+  next() { this.show(this.current + 1); }
+  prev() { this.show(this.current - 1); }
+}
+
+/* ============================================================
+   INLINE EDITOR
+   ============================================================ */
+class InlineEditor {
+  constructor() {
+    this.isActive = false;
+    this.editables = [];
+    this.toggle = document.getElementById('editToggle');
+    this.setupHotzone();
+    this.loadSaved();
+  }
+
+  setupHotzone() {
+    const hz = document.getElementById('editHotzone');
+    let hideTimer = null;
+    const showBtn = () => { clearTimeout(hideTimer); this.toggle.classList.add('show'); };
+    const hideBtn = () => { hideTimer = setTimeout(() => { if (!this.isActive) this.toggle.classList.remove('show'); }, 400); };
+    hz.addEventListener('mouseenter', showBtn);
+    hz.addEventListener('mouseleave', hideBtn);
+    this.toggle.addEventListener('mouseenter', showBtn);
+    this.toggle.addEventListener('mouseleave', hideBtn);
+    hz.addEventListener('click', () => this.toggleEditMode());
+    this.toggle.addEventListener('click', () => this.toggleEditMode());
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 's') { e.preventDefault(); if (this.isActive) this.save(); }
+    });
+  }
+
+  toggleEditMode() {
+    this.isActive = !this.isActive;
+    this.toggle.textContent = this.isActive ? '✓ 保存 (Ctrl+S)' : '✏ 编辑';
+    this.toggle.classList.toggle('active', this.isActive);
+    const targets = document.querySelectorAll('.body,.blist li,.nlist li,.c-body,.callout-b,.stat-l,.pipe-tbl td,.clin-tbl td,.ct');
+    if (this.isActive) {
+      targets.forEach(el => { el.contentEditable = 'true'; });
+    } else {
+      targets.forEach(el => { el.removeAttribute('contenteditable'); });
+      this.save();
+    }
+  }
+
+  save() {
+    try {
+      const data = {};
+      document.querySelectorAll('[contenteditable]').forEach((el, i) => {
+        data[i] = el.innerHTML;
+      });
+      localStorage.setItem('car-slides-edit', JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  loadSaved() {
+    try {
+      const saved = localStorage.getItem('car-slides-edit');
+      if (!saved) return;
+      // Saved edits would be restored on re-enable of edit mode
+    } catch(e) {}
+  }
+}
+
+const deck = new SlidePresentation();
+const editor = new InlineEditor();
+</script>
+</body>
+</html>
