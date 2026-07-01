@@ -1,0 +1,108 @@
+{
+  "id": "ep01",
+  "title_zh": "陶鹰鼎",
+  "title_en": "The Pottery Eagle-Shaped Ding",
+  "era_zh": "新石器时代 · 仰韶文化",
+  "era_en": "Neolithic Period · Yangshao Culture",
+  "museum_zh": "中国国家博物馆",
+  "museum_en": "National Museum of China",
+  "background": {
+    "zh": "这是一件五千多年前的陶器。它被塑造成一只雄鹰的样子，粗壮的双腿撑起厚实的躯干，成为一件盛放谷物的容器。",
+    "en": "This is a piece of pottery made more than five thousand years ago. It was shaped like a standing eagle, its two sturdy legs supporting a thick body that also served as a container for grain."
+  },
+  "transcript": [
+    {
+      "id": 1,
+      "zh": "五千年前的匠人，并没有把这件器物做成一个简单的罐子。",
+      "en": "The craftsman of five thousand years ago did not simply make this vessel into a plain jar.",
+      "pattern_ref": "p1"
+    },
+    {
+      "id": 2,
+      "zh": "他选择了一只鹰的姿态：低头，弓背，双腿分立，仿佛随时准备起飞。",
+      "en": "Instead, he chose the posture of an eagle: head lowered, back arched, legs planted apart, as if ready to take flight at any moment.",
+      "pattern_ref": "p2"
+    },
+    {
+      "id": 3,
+      "zh": "这不仅是一件实用的容器，更是先民对力量与飞翔的想象。",
+      "en": "This was not only a practical container, but also an expression of early people's imagination about strength and flight.",
+      "pattern_ref": "p1"
+    },
+    {
+      "id": 4,
+      "zh": "泥土经过烈火淬炼，才能变成如此坚硬的陶器。",
+      "en": "Only after clay has been tempered by intense fire can it become pottery this hard.",
+      "pattern_ref": "p3"
+    },
+    {
+      "id": 5,
+      "zh": "今天，它安静地立在展柜中，却依然让人感受到那份原始的力量。",
+      "en": "Today, it stands quietly in a display case, yet it still lets people feel that primal sense of power.",
+      "pattern_ref": "p4"
+    }
+  ],
+  "sentence_patterns": [
+    {
+      "id": "p1",
+      "pattern": "not only A, but also B",
+      "zh_explanation": "用来强调事物具有超出预期的双重属性，语气比单独说 A and B 更强。",
+      "en_explanation": "Used to emphasize that something has two qualities, where the second is more surprising or important than expected. Stronger emphasis than a plain 'and'.",
+      "example_from_transcript": "This was not only a practical container, but also an expression of early people's imagination about strength and flight.",
+      "extra_examples": [
+        "The museum is not only a place to see artifacts, but also a place to learn history.",
+        "She is not only a translator, but also a published poet."
+      ]
+    },
+    {
+      "id": "p2",
+      "pattern": "as if + past tense (hypothetical comparison)",
+      "zh_explanation": "'as if' 引导一个虚拟的比较，表示看起来像是某种情况，但并非事实。",
+      "en_explanation": "'as if' introduces a hypothetical comparison — describing how something looks or seems, without claiming it is literally true.",
+      "example_from_transcript": "legs planted apart, as if ready to take flight at any moment.",
+      "extra_examples": [
+        "He stood still, as if he had seen a ghost.",
+        "The old bridge creaked, as if it might collapse at any moment."
+      ]
+    },
+    {
+      "id": "p3",
+      "pattern": "Only after X can Y (inversion for emphasis)",
+      "zh_explanation": "当 'only after...' 放在句首时，主句需要部分倒装（助动词提前），用于强调条件的必要性。",
+      "en_explanation": "When 'only after...' opens a sentence, the main clause uses partial inversion (auxiliary verb moves before the subject), emphasizing that the condition is necessary.",
+      "example_from_transcript": "Only after clay has been tempered by intense fire can it become pottery this hard.",
+      "extra_examples": [
+        "Only after years of practice can a student write with true fluency.",
+        "Only after the flood receded could the villagers return home."
+      ]
+    },
+    {
+      "id": "p4",
+      "pattern": "yet + contrast clause",
+      "zh_explanation": "'yet' 用于连接两个存在对比的分句，比 'but' 更书面、更强调转折。",
+      "en_explanation": "'yet' connects two contrasting clauses; it feels more formal and emphatic than 'but'.",
+      "example_from_transcript": "it stands quietly in a display case, yet it still lets people feel that primal sense of power.",
+      "extra_examples": [
+        "The room was small, yet it felt warm and welcoming.",
+        "He had little formal education, yet he became a brilliant engineer."
+      ]
+    }
+  ],
+  "vocabulary": [
+    { "term_zh": "陶器", "pinyin": "táoqì", "term_en": "pottery", "pos": "n.", "example_zh": "这件陶器已有五千年历史。", "example_en": "This piece of pottery is five thousand years old." },
+    { "term_zh": "容器", "pinyin": "róngqì", "term_en": "container / vessel", "pos": "n.", "example_zh": "它既是雕塑，也是容器。", "example_en": "It is both a sculpture and a container." },
+    { "term_zh": "姿态", "pinyin": "zītài", "term_en": "posture / stance", "pos": "n.", "example_zh": "雄鹰的姿态充满力量。", "example_en": "The eagle's posture is full of strength." },
+    { "term_zh": "淬炼", "pinyin": "cuìliàn", "term_en": "to temper (through fire/hardship)", "pos": "v.", "example_zh": "泥土经过淬炼才能成陶。", "example_en": "Clay must be tempered before it becomes pottery." },
+    { "term_zh": "原始", "pinyin": "yuánshǐ", "term_en": "primal / primitive", "pos": "adj.", "example_zh": "它带着一种原始的力量。", "example_en": "It carries a kind of primal power." }
+  ],
+  "assignment": {
+    "instructions_zh": "请先不要查看参考答案，尝试把下面的中文句子翻译成英文。翻译完成后点击「查看参考翻译」进行对比，重点检查你是否用上了本集学到的句型。",
+    "instructions_en": "Try translating the Chinese sentences below into English before checking the reference translation. Afterwards, click 'Show reference translation' and compare — pay special attention to whether you used the sentence patterns from this episode.",
+    "sentences": [
+      { "zh": "这件文物不仅造型独特，更蕴含着古人的智慧。", "reference_en": "This artifact is not only unique in shape, but also embodies the wisdom of ancient people." },
+      { "zh": "他站在那里一动不动，仿佛在等待什么。", "reference_en": "He stood there without moving, as if waiting for something." },
+      { "zh": "只有反复打磨，这块玉才能变得如此光滑。", "reference_en": "Only after repeated polishing could this piece of jade become so smooth." },
+      { "zh": "展厅里很安静，然而每一件展品都在诉说着历史。", "reference_en": "The gallery is quiet, yet every exhibit is telling a story of history." }
+    ]
+  }
+}

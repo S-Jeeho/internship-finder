@@ -1,0 +1,22 @@
+[
+  {
+    "id": "ep01",
+    "title_zh": "陶鹰鼎",
+    "title_en": "The Pottery Eagle-Shaped Ding",
+    "era_zh": "新石器时代 · 仰韶文化",
+    "era_en": "Neolithic Period · Yangshao Culture",
+    "level": "Intermediate",
+    "duration_min": 5,
+    "file": "episode-01.json"
+  },
+  {
+    "id": "ep02",
+    "title_zh": "越王勾践剑",
+    "title_en": "The Sword of Goujian, King of Yue",
+    "era_zh": "春秋时期",
+    "era_en": "Spring and Autumn Period",
+    "level": "Intermediate",
+    "duration_min": 5,
+    "file": "episode-02.json"
+  }
+]

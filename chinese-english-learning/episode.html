@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Episode</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>如果国宝会说话</h1>
+    <div class="subtitle en-title">Every Treasure Tells a Story</div>
+  </header>
+
+  <main>
+    <a class="back-link" href="index.html">&larr; Back to all episodes</a>
+
+    <div class="episode-title">
+      <h2 id="ep-title-zh"></h2>
+      <div class="en-title" id="ep-title-en"></div>
+      <div class="meta" id="ep-meta"></div>
+    </div>
+
+    <section>
+      <h3>Background</h3>
+      <div class="bg-block">
+        <div class="zh" id="bg-zh"></div>
+        <div class="en" id="bg-en"></div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Transcript (Chinese / English)</h3>
+      <div id="transcript"></div>
+    </section>
+
+    <section>
+      <h3>Sentence Patterns</h3>
+      <div id="patterns"></div>
+    </section>
+
+    <section>
+      <h3>Vocabulary</h3>
+      <table class="vocab-table">
+        <thead>
+          <tr><th>Chinese</th><th>English</th><th>Example</th></tr>
+        </thead>
+        <tbody id="vocab-body"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>Assignment: Try Translating It Yourself</h3>
+      <div class="assignment-instructions" id="assignment-instructions"></div>
+      <div id="assignment-list"></div>
+    </section>
+
+    <div id="complete-toggle"></div>
+  </main>
+
+  <footer class="site-footer">
+    Built for English learners studying through Chinese cultural documentaries.
+  </footer>
+
+  <script src="js/episode.js"></script>
+</body>
+</html>

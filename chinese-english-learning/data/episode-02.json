@@ -1,0 +1,119 @@
+{
+  "id": "ep02",
+  "title_zh": "越王勾践剑",
+  "title_en": "The Sword of Goujian, King of Yue",
+  "era_zh": "春秋时期",
+  "era_en": "Spring and Autumn Period",
+  "museum_zh": "湖北省博物馆",
+  "museum_en": "Hubei Provincial Museum",
+  "background": {
+    "zh": "这把青铜剑在地下埋藏了两千多年，出土时剑身依旧寒光凛冽，几乎没有锈蚀。",
+    "en": "This bronze sword lay buried underground for more than two thousand years, yet when it was unearthed its blade was still cold and gleaming, with almost no rust."
+  },
+  "transcript": [
+    {
+      "id": 1,
+      "zh": "一把剑埋藏两千多年，出土时依然锋利如初，这本身就是一个谜。",
+      "en": "That a sword remains as sharp as new after being buried for more than two thousand years is, in itself, a mystery.",
+      "pattern_ref": "p1"
+    },
+    {
+      "id": 2,
+      "zh": "剑身上刻着八个鸟篆铭文，正是这些文字，让人们确认了它的主人。",
+      "en": "Eight bird-seal-script characters are carved into the blade, and it is precisely these characters that allowed people to identify its owner.",
+      "pattern_ref": "p2"
+    },
+    {
+      "id": 3,
+      "zh": "越王勾践，一个曾经卧薪尝胆的君主，把毅力铸进了这把剑里。",
+      "en": "Goujian, King of Yue, a ruler once known for enduring hardship to strengthen his resolve, seemed to have cast that very willpower into this blade.",
+      "pattern_ref": "p3"
+    },
+    {
+      "id": 4,
+      "zh": "剑越锋利，越需要精湛的工艺来支撑。",
+      "en": "The sharper a sword is, the more it depends on masterful craftsmanship to support that sharpness.",
+      "pattern_ref": "p4"
+    },
+    {
+      "id": 5,
+      "zh": "两千多年后，它依旧安静地躺在展柜中，仿佛从未被时间打败过。",
+      "en": "More than two thousand years later, it still lies quietly in its display case, as if it had never once been defeated by time.",
+      "pattern_ref": "p2b"
+    }
+  ],
+  "sentence_patterns": [
+    {
+      "id": "p1",
+      "pattern": "That-clause as subject (formal emphasis)",
+      "zh_explanation": "用 'That + 从句' 作主语，是一种正式、书面的表达方式，常用于强调一个事实本身令人惊讶或重要。",
+      "en_explanation": "Using a 'That-clause' as the subject of a sentence is a formal, written style often used to emphasize that a fact itself is surprising or significant.",
+      "example_from_transcript": "That a sword remains as sharp as new after being buried for more than two thousand years is, in itself, a mystery.",
+      "extra_examples": [
+        "That she finished the marathon after only two months of training surprised everyone.",
+        "That the ancient bridge still stands after a thousand years is remarkable."
+      ]
+    },
+    {
+      "id": "p2",
+      "pattern": "it is precisely X that... (cleft sentence for emphasis)",
+      "zh_explanation": "强调句型 'it is precisely X that...' 用来突出说明真正起作用的原因或对象。",
+      "en_explanation": "This cleft-sentence pattern highlights exactly which element is responsible for something — stronger than simply stating the fact.",
+      "example_from_transcript": "it is precisely these characters that allowed people to identify its owner.",
+      "extra_examples": [
+        "It is precisely this attention to detail that makes her work outstanding.",
+        "It is precisely the lack of rust that puzzled scientists for decades."
+      ]
+    },
+    {
+      "id": "p3",
+      "pattern": "appositive phrase for extra description",
+      "zh_explanation": "在名词后加一个逗号，插入一段补充说明（同位语），可以让句子更简洁地包含背景信息，而不必另起一句。",
+      "en_explanation": "Placing a descriptive phrase right after a noun, set off by commas, adds background information compactly without starting a new sentence.",
+      "example_from_transcript": "Goujian, King of Yue, a ruler once known for enduring hardship to strengthen his resolve, seemed to have cast that very willpower into this blade.",
+      "extra_examples": [
+        "Marie Curie, a physicist who won two Nobel Prizes, remains an inspiration to scientists today.",
+        "The museum, a century-old building near the river, houses thousands of artifacts."
+      ]
+    },
+    {
+      "id": "p4",
+      "pattern": "The + comparative..., the + comparative... (parallel comparison)",
+      "zh_explanation": "'The + 比较级..., the + 比较级...' 用来表达两件事情程度上同步变化的关系。",
+      "en_explanation": "This 'the more..., the more...' structure expresses that two things change in proportion to each other.",
+      "example_from_transcript": "The sharper a sword is, the more it depends on masterful craftsmanship to support that sharpness.",
+      "extra_examples": [
+        "The older the bronze, the more carefully it must be preserved.",
+        "The more you practice translation, the more natural your sentences become."
+      ]
+    },
+    {
+      "id": "p2b",
+      "pattern": "as if it had never... (past perfect after 'as if')",
+      "zh_explanation": "当 'as if' 描述的情况早于主句动作、且与事实相反时，从句用过去完成时。",
+      "en_explanation": "When the situation described by 'as if' happened earlier than the main verb and is contrary to fact, the clause uses the past perfect tense.",
+      "example_from_transcript": "it still lies quietly in its display case, as if it had never once been defeated by time.",
+      "extra_examples": [
+        "She smiled calmly, as if nothing had happened.",
+        "The house looked untouched, as if no one had lived there for years."
+      ]
+    }
+  ],
+  "vocabulary": [
+    { "term_zh": "青铜", "pinyin": "qīngtóng", "term_en": "bronze", "pos": "n.", "example_zh": "这把剑由青铜铸造而成。", "example_en": "This sword was cast from bronze." },
+    { "term_zh": "锋利", "pinyin": "fēnglì", "term_en": "sharp", "pos": "adj.", "example_zh": "剑身依旧锋利。", "example_en": "The blade is still sharp." },
+    { "term_zh": "铭文", "pinyin": "míngwén", "term_en": "inscription", "pos": "n.", "example_zh": "剑身上刻有铭文。", "example_en": "An inscription is carved into the blade." },
+    { "term_zh": "毅力", "pinyin": "yìlì", "term_en": "willpower / perseverance", "pos": "n.", "example_zh": "他以毅力著称。", "example_en": "He is known for his perseverance." },
+    { "term_zh": "工艺", "pinyin": "gōngyì", "term_en": "craftsmanship", "pos": "n.", "example_zh": "这需要精湛的工艺。", "example_en": "This requires masterful craftsmanship." }
+  ],
+  "assignment": {
+    "instructions_zh": "请先不要查看参考答案，尝试把下面的中文句子翻译成英文，注意尝试使用本集的强调句型和比较句型。完成后点击「查看参考翻译」进行对比。",
+    "instructions_en": "Try translating the sentences below before checking the reference. Try to use this episode's emphasis and comparative patterns. Then click 'Show reference translation' to compare.",
+    "sentences": [
+      { "zh": "这座桥历经千年依然屹立，这本身就令人惊叹。", "reference_en": "That this bridge still stands after a thousand years is, in itself, astonishing." },
+      { "zh": "正是这种坚持,让他最终获得了成功。", "reference_en": "It is precisely this persistence that eventually brought him success." },
+      { "zh": "天气越冷,游客反而越多。", "reference_en": "The colder the weather, the more tourists there seem to be." },
+      { "zh": "她平静地离开了,仿佛什么都没有发生过。", "reference_en": "She left calmly, as if nothing had ever happened." }
+    ]
+  }
+}
