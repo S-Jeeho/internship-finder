@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- `src/ppt_creator/` — new package scaffold for PowerPoint generation
 - Step 1: Project skeleton — directory structure, CHANGELOG, .gitignore, .env.example, requirements.txt
 - Step 1: `config/settings.py` — loads and validates all environment variables
 - Step 1: `config/sic_codes.py` — UK SIC 2007 biology sector codes
